@@ -1,0 +1,6 @@
+; $Id$
+name = Twitter
+description = This module posts blog updates to twitter.com
+version = "$Name$"
+
+
