@@ -155,6 +155,15 @@ function twitter_cache_user($twitter_user = array()) {
   drupal_write_record('twitter_account', $twitter_user);
 }
 
+function twitter_cache_status($status = array(), $silent = FALSE) {
+  db_query("DELETE FROM {twitter} WHERE twitter_id = %d", $status['twitter_id']);
+  drupal_write_record('twitter', $status);
+  if (!$silent) {
+    module_invoke_all('twitter_status_update', $status);
+  }
+}
+
+
 function twitter_get_user_accounts($uid) {
   $sql = "SELECT *, tu.screen_name AS screen_name FROM {twitter_user} tu LEFT JOIN {twitter_account} ta ON (tu.screen_name = ta.screen_name) WHERE tu.uid = %d";
   $args = array($uid);
