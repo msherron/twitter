@@ -5,7 +5,7 @@
  * description.
  */
 $(document).ready(function() {
-  $("#twitter-textarea").keyup(function() {
+  $("#twitter-textfield").keyup(function() {
     var charsLeft = (140 - $(this).val().length);
     var descDiv = $(this).parent().parent().parent().children(".description");
     $(descDiv).html("<strong>" + charsLeft + "</strong> characters remaining");
@@ -17,19 +17,19 @@ $(document).ready(function() {
       $("#twitter-post-button").removeAttr('disabled');
     }
   });
-  
+
   if (!$("#twitter-toggle").attr("checked")) {
-    $("#twitter-textarea-wrapper").hide();
-    $("#twitter-account-wrapper").hide();    
+    $("#twitter-textfield-wrapper").hide();
+    $("#twitter-account-wrapper").hide();
   }
-  
+
   $("#twitter-toggle").bind("click", function() {
     if ($("#twitter-toggle").attr("checked")) {
-      $("#twitter-textarea-wrapper").show();
+      $("#twitter-textfield-wrapper").show();
       $("#twitter-account-wrapper").show();
     }
     else {
-      $("#twitter-textarea-wrapper").hide();
+      $("#twitter-textfield-wrapper").hide();
       $("#twitter-account-wrapper").hide();
     }
   });
