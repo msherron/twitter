@@ -26,7 +26,7 @@ function twitter_form($account = NULL) {
     $account = $user;
   }
 
-  $twitter_accounts = drupal_map_assoc(array_keys(twitter_get_user_accounts($account->uid)));
+  $twitter_accounts = drupal_map_assoc(array_keys(twitter_get_user_accounts($account->uid, TRUE)));
   if (count($twitter_accounts)) {
     $form = array();
     $form['status'] = array(
@@ -374,8 +374,11 @@ function twitter_cache_status($status = array(), $silent = FALSE) {
  * User/account relationship code
  */
 
-function twitter_get_user_accounts($uid) {
+function twitter_get_user_accounts($uid, $only_with_passwords = FALSE) {
   $sql = "SELECT ta.*, tu.uid, tu.password, tu.import FROM {twitter_user} tu LEFT JOIN {twitter_account} ta ON (tu.screen_name = ta.screen_name) WHERE tu.uid = %d";
+  if ($only_with_passwords) {
+    $sql .= " AND tu.password IS NULL";
+  }
   $args = array($uid);
   $results = db_query($sql, $args);
 
