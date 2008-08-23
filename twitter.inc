@@ -300,7 +300,6 @@ function _twitter_request_failure($results) {
       // Probably a bogus username.
       watchdog('twitter', 'Twitter account could not be retrieved.');
       return TRUE;
-
   }
   return FALSE;
 }

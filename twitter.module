@@ -140,3 +140,20 @@ function twitter_cron() {
     db_query('DELETE {twitter} WHERE created_time < %d', time() - $age);
   }
 }
+
+
+/**
+ * This helper function converts Twitter-style @usernames and #hashtags into 
+ * actual links.
+ */
+function twitter_link_filter($text, $prefix = '@', $destination = 'http://twitter.com/') {
+  $matches = array(
+    '/^' . $prefix . '([a-z0-9_]{0,15})/i',
+    '/(\s+)' . $prefix . '([a-z0-9_]{0,15})/i'
+  );
+  $replacements = array(
+    '<a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
+    '${1}<a href="' . $destination . '${2}">' . $prefix . '${2}</a>'
+  );
+  return preg_replace($matches, $replacements, $text); 
+}
