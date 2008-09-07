@@ -409,6 +409,11 @@ function twitter_user_save($account = array(), $force_import = FALSE) {
       twitter_fetch_account_info($account['screen_name'], $account['password']);
       $statuses = twitter_fetch_statuses($account['screen_name'], $account['password']);
     }
+    
+    if (!empty($statuses)) {
+      twitter_cache_account($statuses[0]['account']);
+      twitter_touch_account($account['screen_name']);
+    }
   }
 }
 

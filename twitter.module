@@ -210,3 +210,11 @@ function twitter_link_filter($text, $prefix = '@', $destination = 'http://twitte
   );
   return preg_replace($matches, $replacements, $text); 
 }
+
+/**
+ * Implementation of hook_views_api.
+ * Notifies the Views module that we're compatible with a particular API revision.
+ */
+function twitter_views_api() {
+  return array('api' => 2);
+}
