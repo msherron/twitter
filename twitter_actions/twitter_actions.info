@@ -1,0 +1,5 @@
+; $Id$
+name = Twitter actions
+description = Exposes Drupal actions to send Twitter messages.
+dependencies[] = twitter
+core = 6.x
