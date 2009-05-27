@@ -43,7 +43,7 @@ function twitter_views_data() {
   $data['twitter']['table']['base'] = array(
     'field' => 'twitter_id',
     'title' => t('Twitter message'),
-    'help' => t('Stores Twitter status messages.'),
+    'help' => t('Twitter status messages.'),
     'weight' => 10,
   );
 
@@ -201,7 +201,7 @@ function twitter_views_data() {
 
   // Twitter account description
   $data['twitter_account']['followers_count'] = array(
-    'title' => t('Location'),
+    'title' => t('Followers'),
     'help' => t('The number of users following this Twitter account.'),
     'field' => array(
       'handler' => 'views_handler_field_numeric',
