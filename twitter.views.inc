@@ -122,9 +122,9 @@ function twitter_views_data() {
       'field' => 'screen_name',
     ),
     'users' => array(
-      'field' => 'screen_name',
-      'left_table' => 'twitter_user',
-      'left_field' => 'screen_name',
+      'left_field' => 'uid',
+      'field' => 'uid',
+      //      'left_table' => 'twitter_user',
     ),
   );
 
@@ -273,39 +273,13 @@ function twitter_views_data() {
     ),
   );
 
-
-  $data['twitter_user']['table']['group']  = t('Twitter');
-
-  $data['twitter_user']['table']['join'] = array(
-    'users' => array(
-      'left_field' => 'uid',
-      'field' => 'uid',
-    ),
-    'twitter_account' => array(
-      'left_field' => 'screen_name',
-      'field' => 'screen_name',
-    ),
-    'twitter' => array(
-      'left_table' => 'twitter_account',
-      'left_field' => 'screen_name',
-      'field' => 'screen_name',
-    ),
-  );
-
   // Twitter account description
-  $data['twitter_user']['uid'] = array(
+  $data['twitter_account']['uid'] = array(
     'title' => t('User ID'),
     'help' => t('The UID of the Twitter account.'),
   );
-
-  // Twitter account description
-  $data['twitter_user']['screen_name'] = array(
-    'title' => t('Screen name'),
-    'help' => t('The screen name of the Twitter account.'),
-  );
-
   // Twitter account protected
-  $data['twitter_user']['import'] = array(
+  $data['twitter_account']['import'] = array(
     'title' => t('Import status'),
     'help' => t('Whether posts from this Twitter account should be imported automatically.'),
     'field' => array(
@@ -320,23 +294,18 @@ function twitter_views_data() {
     ),
   );
 
-
   return $data;
 }
 
 
 function twitter_views_data_alter(&$data) {
   $data['users']['table']['join']['twitter'] = array(
-    'left_table' => 'twitter_user',
+    'left_table' => 'twitter_account',
     'left_field' => 'uid',
     'field' => 'uid',
   );
   $data['users']['table']['join']['twitter_account'] = array(
-    'left_table' => 'twitter_user',
-    'left_field' => 'uid',
-    'field' => 'uid',
-  );
-  $data['users']['table']['join']['twitter_user'] = array(
+    //    'left_table' => 'twitter_user',
     'left_field' => 'uid',
     'field' => 'uid',
   );
