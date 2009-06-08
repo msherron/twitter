@@ -315,7 +315,7 @@ class TwitterOAuth extends Twitter {
       case 'GET':
         return $this->request($request->to_url());
       case 'POST':
-        return $this->request($req->get_normalized_http_url(), $request->to_postdata());
+        return $this->request($request->get_normalized_http_url(), $request->to_postdata());
     }
   }
 
