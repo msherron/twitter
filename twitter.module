@@ -8,9 +8,10 @@ function twitter_menu() {
   $items = array();
 
   $items['twitter/oauth'] = array(
-    'title' => 'Twitter OAuth Callback',
+    'title' => 'Twitter',
     'access callback' => TRUE,
-    'page callback' => 'twitter_oauth_callback',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('twitter_oauth_callback'),
     'type' => MENU_CALLBACK,
     'file' => 'twitter.pages.inc',
   );
