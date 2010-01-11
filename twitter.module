@@ -24,6 +24,11 @@ function twitter_menu() {
     'access arguments' => array('administer site configuration'),
     'file' => 'twitter.pages.inc'
   );
+  
+  $items['admin/settings/twitter/default'] = array(
+    'title' => 'Twitter',
+    'type' => MENU_DEFAULT_LOCAL_TASK
+  );
 
   $items['user/%user_category/edit/twitter'] = array(
     'title' => 'Twitter accounts',

@@ -14,6 +14,12 @@ function twitter_admin_form() {
     '#access' => module_exists('oauth'),
   );
 
+  $form['oauth']['callback_url'] = array(
+    '#type' => 'item',
+    '#title' => t('Callback URL'),
+    '#value' => url('twitter/oauth', array('absolute' => TRUE)),
+  );
+
   $form['oauth']['twitter_consumer_key'] = array(
     '#type' => 'textfield',
     '#title' => t('OAuth Consumer key'),
