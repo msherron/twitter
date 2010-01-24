@@ -232,6 +232,13 @@ function twitter_schema() {
         'type' => 'int',
         'not null' => TRUE
       ),
+      'is_global' => array(
+        'description' => t("Boolean flag indicating if this account is available for global use"),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
     ),
     'indexes' => array('screen_name' => array('screen_name')),
     'primary key' => array('twitter_uid'),
