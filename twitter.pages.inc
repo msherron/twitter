@@ -12,6 +12,7 @@ function twitter_admin_form() {
     '#title' => t('OAuth Settings'),
     '#description' => t(''),
     '#access' => module_exists('oauth'),
+    '#description' => t('To enable OAuth based access for twitter, you must <a href="@url">register your application</a> with twitter and add the provided keys here.', array('@url' => 'https://twitter.com/apps/new')),
   );
 
   $form['oauth']['callback_url'] = array(
