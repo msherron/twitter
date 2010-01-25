@@ -50,7 +50,7 @@ function twitter_admin_form() {
   $form['import']['twitter_expire'] = array(
     '#type' => 'select',
     '#title' => t('Delete old statuses'),
-    '#default_value' => variable_get('amazon_refresh_schedule', 0),
+    '#default_value' => variable_get('twitter_expire', 0),
     '#options' => $periods
   );
 
