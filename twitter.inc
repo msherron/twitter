@@ -28,7 +28,7 @@ function twitter_connect($account) {
  */
 function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL) {
   $values = (array)$twitter_user;
-  $values['twitter_uid'] = $twitter_user->id;
+  $values['twitter_uid'] = $values['id'];
 
   if ($save_auth) {
     $values += $twitter_user->get_auth();
@@ -38,8 +38,7 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
     }
     $values['uid'] = $account->uid;
   }
-
-  if (db_result(db_query("SELECT 1 FROM {twitter_account} WHERE twitter_uid = %d", $twitter_user->id))) {
+  if (db_result(db_query("SELECT 1 FROM {twitter_account} WHERE twitter_uid = %d", $values['id']))) {
     drupal_write_record('twitter_account', $values, array('twitter_uid'));
   }
   else {
@@ -54,6 +53,7 @@ function twitter_account_load($id) {
   $values['id'] = $values['twitter_uid'];
   $account = new TwitterUser($values);
   $account->set_auth($values);
+  $account->import = $values['import'];
   $account->is_global = $values['is_global'];
   
   return $account;
