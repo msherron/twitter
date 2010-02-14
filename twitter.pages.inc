@@ -176,7 +176,7 @@ function twitter_account_list_form_submit($form, &$form_state) {
       twitter_account_save($account);
     }
     else {
-      twitter_user_delete($account['uid'], $account['screen_name']);
+      twitter_user_delete($account['id'], $account['screen_name']);
     }
   }
 }
