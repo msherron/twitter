@@ -53,6 +53,7 @@ function twitter_account_load($id) {
   $values['id'] = $values['twitter_uid'];
   $account = new TwitterUser($values);
   $account->set_auth($values);
+  $account->uid = $values['uid'];
   $account->import = $values['import'];
   $account->is_global = $values['is_global'];
   
