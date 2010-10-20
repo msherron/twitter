@@ -93,6 +93,7 @@ function twitter_actions_set_status_action($object, $context) {
 
   switch ($context['hook']) {
     case 'nodeapi':
+    case 'workflow':
       // Because this is not an action of type 'node' the node
       // will not be passed as $object, but it will still be available
       // in $context.
