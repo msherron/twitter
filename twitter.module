@@ -57,7 +57,7 @@ function twitter_menu() {
  * Implementation of hook_perm()
  */
 function twitter_perm() {
-  return array('add twitter accounts', 'use global twitter account', 'make twitter accounts global');
+  return array('add twitter accounts', 'use global twitter account', 'make twitter accounts global', 'import own tweets');
 }
 
 /**
