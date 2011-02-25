@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 function twitter_views_default_views() {
   $view = new view;

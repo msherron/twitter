@@ -1,4 +1,3 @@
-// $Id$
 
 /**
  * Attach handlers to count the number of words in a given textfield, in its

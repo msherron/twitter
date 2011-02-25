@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 function twitter_signin_admin_settings() {
   $form = array();
