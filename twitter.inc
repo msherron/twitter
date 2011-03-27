@@ -37,12 +37,20 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
     }
     $values['uid'] = $account->uid;
   }
+  db_merge('twitter_account')
+    ->key(array('twitter_uid' => $values['id']))
+    ->fields(array(
+        
+      ))
+    ->execute();
+/*
   if (db_query("SELECT 1 FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $values['id']))->fetchField()) {
     drupal_write_record('twitter_account', $values, array('twitter_uid'));
   }
   else {
     drupal_write_record('twitter_account', $values);
   }
+*/
 }
 
 /**
