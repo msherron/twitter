@@ -210,7 +210,6 @@ function twitter_twitter_accounts($account) {
 
   $twitter_uids = $query->execute()->fetchCol();
   foreach ($twitter_uids as $twitter_uid) {
-    $key = $row->twitter_uid;
     $twitter_accounts[] = twitter_account_load($twitter_uid);
   }
 
