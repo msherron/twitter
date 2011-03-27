@@ -236,7 +236,7 @@ class Twitter {
       $headers['Content-type'] = 'application/x-www-form-urlencoded';
     }
 
-    $response = drupal_http_request($url, $headers, $method, $data);
+    $response = drupal_http_request($url, array('headers' => $headers, 'method' => $method, 'data' => $data));
     if (!isset($response->error)) {
       return $response->data;
     }
