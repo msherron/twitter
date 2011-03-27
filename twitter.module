@@ -1,11 +1,9 @@
 <?php
 
 /**
- * Implementation of hook_meu()
+ * Implements hook_meu().
  */
 function twitter_menu() {
-  $items = array();
-
   $items['twitter/oauth'] = array(
     'title' => 'Twitter',
     'access callback' => TRUE,
@@ -14,72 +12,69 @@ function twitter_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'twitter.pages.inc',
   );
-  
-  $items['admin/settings/twitter'] = array(
-    'title' => 'Twitter setup',
-    'description' => 'Twitter module settings',
+
+  $items['admin/config/services/twitter'] = array(
+    'title' => 'Twitter',
+    'description' => 'Configure integration with Twitter (and compatible) API services.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('twitter_admin_form'),
     'access arguments' => array('administer site configuration'),
-    'file' => 'twitter.pages.inc'
+    'file' => 'twitter.pages.inc',
   );
-  
-  $items['admin/settings/twitter/default'] = array(
+  $items['admin/config/services/twitter/default'] = array(
     'title' => 'Twitter',
-    'type' => MENU_DEFAULT_LOCAL_TASK
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
-  $items['user/%user_category/edit/twitter'] = array(
+  $items['user/%user/edit/twitter'] = array(
     'title' => 'Twitter accounts',
     'page callback' => 'twitter_user_settings',
     'page arguments' => array(1),
     'access arguments' => array('add twitter accounts'),
-    'load arguments' => array('%map', '%index'),
     'weight' => 10,
     'file' => 'twitter.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
-
   $items['user/%user/edit/twitter/global/%'] = array(
     'title' => 'Twitter accounts',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('twitter_user_make_global', 1, 5),
     'access arguments' => array('make twitter accounts global'),
     'file' => 'twitter.pages.inc',
-    'type' => MENU_CALLBACK,
   );
-  
+
   return $items;
 }
 
 /**
- * Implementation of hook_perm()
+ * Implements hook_permission().
  */
-function twitter_perm() {
-  return array('add twitter accounts', 'use global twitter account', 'make twitter accounts global', 'import own tweets');
+function twitter_permission() {
+  return array(
+    'add twitter accounts' => array(
+      'title' => t('Add Twitter accounts'),
+    ),
+    'use global twitter account' => array(
+      'title' => t('Use global Twitter account'),
+      'description' => t('Use the site global Twitter account.'),
+    ),
+    'make twitter accounts global' => array(
+      'title' => t('Assign a Twitter account as the site global account.'),
+    ),
+    'import own tweets' => array(
+      'title' => t('Import own tweets to the site.'),
+    ),
+  );
 }
 
 /**
- * Implementation of hook_user().
+ * Implements hook_theme().
  */
-function twitter_user($op, &$edit, &$account, $category = NULL) {
-  switch ($op) {
-    case 'categories':
-      return array(
-        array(
-          'name' => 'twitter',
-          'title' => 'Twitter accounts',
-          'weight' => 3,
-        ),
-      );
-  }
-}
-
 function twitter_theme() {
   return array(
     'twitter_account_list_form' => array(
-      'arguments' => array('form' => NULL),
-    )
+      'render element' => 'form',
+    ),
   );
 }
 
@@ -102,7 +97,7 @@ function twitter_shorten_url($url) {
 }
 
 /**
- * Implementation of hook_cron()
+ * Implements hook_cron().
  *
  * Imports new Twitter statuses for site users, and deletes expired tweets.
  */
@@ -116,74 +111,54 @@ function twitter_cron() {
   // Pull up a list of Twitter accounts that are flagged for updating,
   // sorted by how long it's been since we last updated them. This ensures
   // that the most out-of-date accounts get updated first.
-
-  $sql  = "SELECT twitter_uid FROM {twitter_account} WHERE import = 1 ORDER BY last_refresh ASC";
-
-  $results = db_query_range($sql, 0, 20);
-  while ($account = db_fetch_object($results)) {
+  $result = db_query_range("SELECT twitter_uid FROM {twitter_account} WHERE import = :import ORDER BY last_refresh ASC", 0, 20, array(':import' => 1));
+  foreach ($result as $account) {
     twitter_fetch_user_timeline($account->twitter_uid);
   }
 
   // Nuke old statuses.
   if ($age = variable_get('twitter_expire', 0)) {
-    db_query('DELETE FROM {twitter} WHERE created_time < %d', time() - $age);
+    db_delete('twitter')
+      ->condition('created_time', REQUEST_TIME - $age, '<')
+      ->execute();
   }
 }
 
-
 /**
- * Implementation of hook_filter().
- * - Twitter @username converter:
- *     .Converts Twitter-style @usernames into links to Twitter account pages.
- * - Twitter #hashtag converter:
- *     .Converts Twitter-style #hashtags into links to hashtags.org.
+ * Implements hook_filter_info().
  */
-function twitter_filter($op, $delta = 0, $format = -1, $text = '') {
-  switch ($op) {
-    case 'list':
-      return array(0 => t('Twitter @username converter'), 1 => t('Twitter #hashtag converter'));
-
-    case 'description':
-      switch ($delta) {
-        case 0:
-          return t('Converts Twitter-style @usernames into links to Twitter account pages.');
-        case 1:
-          return t('Converts Twitter-style #hashtags into links to hashtags.org.');
-        default:
-          return;
-      }
-
-    case 'process':
-      switch ($delta) {
-        case 0:
-          return twitter_link_filter($text);
-        case 1:
-          return twitter_link_filter($text, '#', 'http://search.twitter.com/search?q=%23');
-        default:
-          return $text;
-      }
-
-    default:
-      return $text;
-  }
+function twitter_filter_info() {
+  $filters['twitter_username'] = array(
+    'title' => t('Twitter @username converter'),
+    'description' => t('Converts Twitter-style @usernames into links to Twitter account pages.'),
+    'process callback' => 'twitter_link_filter',
+    'tips callback' => 'twitter_filter_tip_username',
+  );
+  $filters['twitter_hashtag'] = array(
+    'title' => t('Twitter #hashtag converter'),
+    'description' => t('Converts Twitter-style #hashtags into links to hashtags.org.'),
+    'process callback' => 'twitter_link_filter',
+    'tips callback' => 'twitter_filter_tip_hashtag',
+  );
+  return $filters;
 }
 
 /**
- * Implementation of hook_filter_tips().
+ * Filter tips callback function for $filters[0] in hook_filter_info().
  */
-function twitter_filter_tips($delta, $format, $long = FALSE) {
-  global $base_url;
-  switch ($delta) {
-    case 0:
-      return t('Twitter-style @usersnames are linked to their Twitter account pages.');
-
-    case 1:
-      return t('Twitter-style #hashtags are linked to !url.', array('!url' => '<a href="http://search.twitter.com/">search.twitter.com</a>'));
-  }
+function twitter_filter_tip_username($format, $long = FALSE) {
+  return t('Twitter-style @usernames are linked to their Twitter account pages.');
 }
 
 /**
- * This helper function converts Twitter-style @usernames and #hashtags into 
+ * Filter tips callback function for $filters[1] in hook_filter_info().
+ */
+function twitter_filter_tip_hashtag($format, $long = FALSE) {
+  return t('Twitter-style #hashtags are linked to !url.', array('!url' => '<a href="http://search.twitter.com/">search.twitter.com</a>'));
+}
+
+/**
+ * This helper function converts Twitter-style @usernames and #hashtags into
  * actual links.
  */
 function twitter_link_filter($text, $prefix = '@', $destination = 'http://twitter.com/') {
@@ -197,19 +172,17 @@ function twitter_link_filter($text, $prefix = '@', $destination = 'http://twitte
     '<a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
     '${1}<a href="' . $destination . '${2}">' . $prefix . '${2}</a>',
   );
-  return preg_replace($matches, $replacements, $text); 
+  return preg_replace($matches, $replacements, $text);
 }
 
 /**
- * Get a list of twitter accounts available to the current user.
- *
- * @return Array containing TwitterAccount objects
+ * Implements hook_user_load().
  */
-function twitter_get_user_accounts($uid) {
-  $drupal_user = user_load($uid);
-  return module_invoke_all('twitter_accounts', $drupal_user);
+function twitter_user_load($accounts) {
+  foreach ($accounts as $uid => $account) {
+    $accounts[$uid]->twitter_accounts = module_invoke_all('twitter_accounts', $account);
+  }
 }
-
 
 /**
  * An implementation of hook_twitter_accounts. We want to move this into a
@@ -219,33 +192,40 @@ function twitter_get_user_accounts($uid) {
  */
 function twitter_twitter_accounts($account) {
   module_load_include('inc', 'twitter');
-  
-  $twitter_accounts = array();
-  
-  $sql = "SELECT twitter_uid FROM {twitter_account} WHERE uid = %d";
-  if (user_access('use global twitter account')) {
-    $sql.= " OR is_global=1";
-  }
-  $results = db_query($sql, $account->uid);
 
-  while ($row = db_fetch_array($results)) {
-    $key = $row['twitter_uid'];
-    $twitter_accounts[] = twitter_account_load($key);
+  $twitter_accounts = array();
+
+  $query = db_select('twitter_account', 'ta');
+  $query->addField('ta', 'twitter_uid');
+  $query->condition('ta.uid', $account->uid);
+  if (user_access('use global twitter account')) {
+    $or = db_or();
+    $or->condition('ta.uid', $account->uid);
+    $or->condition('ta.is_global', 1);
+    $query->condition($or);
   }
+  else {
+    $query->condition('ta.uid', $account->uid);
+  }
+
+  $twitter_uids = $query->execute()->fetchCol();
+  foreach ($twitter_uids as $twitter_uid) {
+    $key = $row->twitter_uid;
+    $twitter_accounts[] = twitter_account_load($twitter_uid);
+  }
+
   return $twitter_accounts;
 }
 
+/**
+ * Detect whether we should use oauth. This can probably just go now :)
+ */
 function _twitter_use_oauth() {
-  if (!module_exists('oauth')) {
-    return FALSE;
-  }
-  
-  return (variable_get('twitter_consumer_key', '') && variable_get('twitter_consumer_secret', ''));
+  return module_exists('oauth_common') && variable_get('twitter_consumer_key', '') && variable_get('twitter_consumer_secret', '');
 }
 
 /**
- * Implementation of hook_views_api.
- * Notifies the Views module that we're compatible with a particular API revision.
+ * Implements hook_views_api().
  */
 function twitter_views_api() {
   return array('api' => 2);

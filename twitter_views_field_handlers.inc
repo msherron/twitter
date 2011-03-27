@@ -41,7 +41,11 @@ class twitter_views_handler_field_xss extends views_handler_field {
   function render($values) {
     $value = $values->{$this->field_alias};
     if (!empty($this->options['link_urls'])) {
-      $value = _filter_url($value, FILTER_DEFAULT);
+      $filter = new stdClass;
+      $filter->settings = array(
+        'filter_url_length' => 496,
+      );
+     $value = _filter_url($value, $filter);
     }
     if (!empty($this->options['link_usernames'])) {
       $value = twitter_link_filter($value);
@@ -60,7 +64,6 @@ class twitter_views_handler_field_xss extends views_handler_field {
 class twitter_views_handler_field_profile_image extends views_handler_field {
   function render($values) {
     $value = $values->{$this->field_alias};
-    return theme('image', $value, '', '', array(), FALSE);
+    return theme('image', array('path' => $value));
   }
 }
-

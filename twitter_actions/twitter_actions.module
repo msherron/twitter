@@ -6,19 +6,29 @@
  */
 
 /**
- * Implementation of hook_action_info().
+ * Implements hook_action_info().
  */
 function twitter_actions_action_info() {
   return array(
     'twitter_actions_set_status_action' => array(
       'type' => 'system',
-      'description' => t('Post a message to Twitter'),
+      'label' => t('Post a message to Twitter'),
       'configurable' => TRUE,
-      'hooks' => array(
-        'nodeapi' => array('view', 'insert', 'update', 'delete'),
-        'comment' => array('view', 'insert', 'update', 'delete'),
-        'user' => array('view', 'insert', 'update', 'delete', 'login'),
-        'cron' => array('run'),
+      'triggers' => array(
+        'nodeapi_view',
+        'nodeapi_insert',
+        'nodeapi_update',
+        'nodeapi_delete',
+        'comment_view',
+        'comment_insert',
+        'comment_update',
+        'comment_delete',
+        'user_view',
+        'user_insert',
+        'user_update',
+        'user_delete',
+        'user_login',
+        'cron_run',
       ),
     ),
   );
@@ -41,11 +51,11 @@ function twitter_actions_set_status_action_form($context = array()) {
   );
 
   $form['screen_name'] = array(
-    '#type'          => 'textfield',
-    '#title'         => t('Twitter account name'),
+    '#type' => 'textfield',
+    '#title' => t('Twitter account name'),
     '#default_value' => $context['screen_name'],
-    '#size'          => 25,
-    '#required'      => TRUE,
+    '#size' => 25,
+    '#required' => TRUE,
   );
 
   $form['message'] = array(
@@ -55,29 +65,37 @@ function twitter_actions_set_status_action_form($context = array()) {
     '#cols' => '80',
     '#rows' => '3',
     '#description' => t('The message that should be sent. You may include the following variables: %site_name, %username, %node_url, %node_type, %title, %teaser, %body, %tinyurl. Not all variables will be available in all contexts.'),
-    '#required'      => TRUE,
+    '#required' => TRUE,
   );
   return $form;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function twitter_actions_set_status_action_validate($form, $form_state) {
   if (!_twitter_use_oauth()) {
     form_set_error('screen_name', t('Oath has not yet been setup.'));
   }
-  if (!db_result(db_query("SELECT twitter_uid FROM {twitter_account} WHERE screen_name = '%s'", $form_state['values']['screen_name']))) {
+  if (!db_query("SELECT twitter_uid FROM {twitter_account} WHERE screen_name = :screen_name", array(':screen_name' => $form_state['values']['screen_name']))->fetchField()) {
     form_set_error('screen_name', t('Twitter authentication failed. Please check your account name and try again.'));
   }
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function twitter_actions_set_status_action_submit($form, $form_state) {
   $form_values = $form_state['values'];
-  $twitter_uid = db_result(db_query("SELECT twitter_uid FROM {twitter_account} WHERE screen_name = '%s'", $form_values['screen_name']));
+  $twitter_uid = db_query("SELECT twitter_uid FROM {twitter_account} WHERE screen_name = :screen_name", array(':screen_name' => $form_values['screen_name']))->fetchField();
   // Process the HTML form to store configuration. The keyed array that
   // we return will be serialized to the database.
   $params = array(
     'twitter_uid' => $twitter_uid,
     'screen_name' => $form_values['screen_name'],
-    'message'   => $form_values['message'],
+    'message' => $form_values['message'],
   );
   return $params;
 }
@@ -98,7 +116,7 @@ function twitter_actions_set_status_action($object, $context) {
       // in $context.
       $node = $context['node'];
       break;
-    // The comment hook provides nid, in $context.
+      // The comment hook provides nid, in $context.
     case 'comment':
       $comment = $context['comment'];
       $node = node_load($comment->nid);
@@ -126,7 +144,7 @@ function twitter_actions_set_status_action($object, $context) {
         '%vocabulary_name' => $vocabulary->name,
         '%vocabulary_description' => $vocabulary->description,
         '%vocabulary_id' => $vocabulary->vid,
-        )
+      )
       );
       break;
     default:
@@ -136,7 +154,7 @@ function twitter_actions_set_status_action($object, $context) {
 
   if (isset($node)) {
     if (!isset($account)) {
-      $account = user_load(array('uid' => $node->uid));
+      $account = user_load($node->uid);
     }
     if ($recipient == '%author') {
       $recipient = $account->mail;
@@ -148,20 +166,20 @@ function twitter_actions_set_status_action($object, $context) {
   // Node-based variable translation is only available if we have a node.
   if (isset($node) && is_object($node)) {
     $variables = array_merge($variables, array(
-        '%uid' => $node->uid,
-        '%node_url' => url('node/'. $node->nid, array('absolute' => TRUE)),
-        '%node_type' => node_get_types('name', $node),
-        '%title' => $node->title,
-        '%teaser' => $node->teaser,
-        '%body' => $node->body
-      )
+      '%uid' => $node->uid,
+      '%node_url' => url('node/' . $node->nid, array('absolute' => TRUE)),
+      '%node_type' => node_type_get_name($node),
+      '%title' => $node->title,
+      '%teaser' => $node->teaser,
+      '%body' => $node->body,
+    )
     );
   }
 
   // Only make a tinyurl if it was asked for.
   if (strstr($context['message'], '%tinyurl') !== FALSE) {
     $variables = array_merge($variables, array(
-      '%tinyurl' => twitter_shorten_url(url('node/'. $node->nid, array('absolute' => TRUE))),
+      '%tinyurl' => twitter_shorten_url(url('node/' . $node->nid, array('absolute' => TRUE))),
     ));
   }
 

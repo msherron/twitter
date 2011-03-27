@@ -1,57 +1,55 @@
 <?php
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function twitter_signin_menu() {
-  $items = array();
-
   $items['twitter/redirect'] = array(
     'title' => 'Twitter Redirect',
     'page callback' => 'twitter_signin_redirect',
     'access callback' => TRUE,
-    'type' => MENU_CALLBACK
-    
+    'type' => MENU_CALLBACK,
   );
 
-  $items['admin/settings/twitter/signin'] = array(
+  $items['admin/config/services/twitter/signin'] = array(
     'title' => 'Sign-in',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('twitter_signin_admin_settings'),
     'access arguments' => array('administer site configuration'),
     'file' => 'twitter_signin.pages.inc',
     'type' => MENU_LOCAL_TASK,
-    'weight' => 5
-    
+    'weight' => 5,
   );
 
   return $items;
 }
 
 /**
- * Implementation of hook_block().
+ * Implements hook_block_info().
  */
-function twitter_signin_block($op = 'list', $delta = 0, $edit = array()) {
-  switch ($op) {
-    case 'list':
-      $block[0]['info'] = t('Sign in with Twitter');
-      return $block;
-    case 'view':
-      global $user;
-      
-      if (!$user->uid && _twitter_use_oauth()) {
-        $block['subject'] = t('Sign in with Twitter');
-        $block['content'] = twitter_signin_button();
-        return $block;
-      }
+function twitter_signin_block_info() {
+  $block[0]['info'] = t('Sign in with Twitter');
+  return $block;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function twitter_signin_block_view($delta) {
+  global $user;
+
+  if (!$user->uid && _twitter_use_oauth()) {
+    $block['subject'] = t('Sign in with Twitter');
+    $block['content'] = twitter_signin_button();
+    return $block;
   }
 }
 
 /**
- * Implementation of hook_user().
+ * Implements hook_user_insert().
  */
-function twitter_signin_user($op, &$edit, &$account, $category = NULL) {
-  if ($op == 'insert' && isset($_SESSION['twitter']['values'])) {
+function twitter_signin_user_insert(&$edit, $account, $category) {
+  if (isset($_SESSION['twitter']['values'])) {
     unset($_SESSION['twitter']);
   }
 }
@@ -60,12 +58,10 @@ function twitter_signin_user($op, &$edit, &$account, $category = NULL) {
  * returns an image link for signing in with twitter
  */
 function twitter_signin_button() {
-  $img_path = drupal_get_path('module', 'twitter_signin') . '/images/';
-  $img = $img_path . variable_get('twitter_signin_button', 'Sign-in-with-Twitter-lighter-small.png');
-  
-  return l(theme('image', $img, t('Sign in with Twitter')), 'twitter/redirect', array('html' => TRUE));
-}
+  $img = drupal_get_path('module', 'twitter_signin') . '/images/' . variable_get('twitter_signin_button', 'Sign-in-with-Twitter-lighter-small.png');
 
+  return l(theme('image', array('path' => $img, 'alt' => t('Sign in with Twitter'))), 'twitter/redirect', array('html' => TRUE));
+}
 
 /**
  * Submit handler for twitter signin
@@ -81,35 +77,38 @@ function twitter_signin_redirect() {
   $token = $twitter->get_request_token();
 
   $_SESSION['twitter_oauth']['token'] = $token;
-  $_SESSION['twitter_oauth']['destination'] = referer_uri();
+  $_SESSION['twitter_oauth']['destination'] = $_SERVER['HTTP_REFERER'];
   $_SESSION['twitter_oauth']['signin'] = TRUE;
   drupal_goto($twitter->get_authenticate_url($token));
 }
 
 /**
- * Implementation of hook_form_alter()
+ * Implements hook_form_alter().
  */
 function twitter_signin_form_alter(&$form, $form_state, $form_id) {
   // This only applies if we've got OAuth / signin enabled.
   if (!_twitter_use_oauth()) {
     return;
   }
-  
+
   if ($form_id == 'twitter_oauth_callback' && $_SESSION['twitter_oauth']['signin']) {
     $form['#submit'] = array_merge(array('twitter_signin_oauth_callback_submit'), $form['#submit']);
   }
-  
+
   if ($form_id == 'user_login' || $form_id == 'user_login_block') {
     $items = array();
     $items[] = twitter_signin_button();
-    
+
     $form['twitter_signin'] = array(
-      '#value' => theme('item_list', $items),
+      '#value' => theme('item_list', array('items' => $items)),
     );
   }
   elseif ($form_id == 'user_register' && isset($_SESSION['twitter']['values'])) {
     $form['name']['#default_value'] = $_SESSION['twitter']['values']['screen_name'];
-    $form['auth_twitter'] = array('#type' => 'hidden', '#value' => $_SESSION['twitter']['values']['user_id']);
+    $form['auth_twitter'] = array(
+      '#type' => 'hidden',
+      '#value' => $_SESSION['twitter']['values']['user_id'],
+    );
   }
 }
 
@@ -130,8 +129,11 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
     user_external_login($account, $response);
     $success = TRUE;
   }
-  elseif ($uid = db_result(db_query("SELECT uid FROM {twitter_account} WHERE twitter_uid= %d", $response['user_id']))) {
+  elseif ($uid = db_query("SELECT uid FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $response['user_id']))->fetchField()) {
     // We have an existing twitter account - set it up for login
+    // TODO Convert "user_load" to "user_load_multiple" if "$uid" is other than a uid.
+    // To return a single user object, wrap "user_load_multiple" with "array_shift" or equivalent.
+    // Example: array_shift(user_load_multiple(array(), $uid))
     $account = user_load($uid);
     $edit["authname_twitter"] = $response['user_id'];
     user_save($account, $edit);
@@ -142,7 +144,7 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
     // No existing user account, let's see if we can register.
     if (variable_get('twitter_signin_register', 0)) {
       // Check for a nickname collision
-      $account = user_load(array('name' => $response['screen_name']));
+      $account = array_shift(user_load_multiple(array(), array('name' => $response['screen_name'])));
       if (!$account->uid) {
         $edit = array(
           'name' => $response['screen_name'],
@@ -150,7 +152,7 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
           'init' => $response['screen_name'],
           'status' => 1,
           "authname_twitter" => $response['user_id'],
-          'access' => time(),
+          'access' => REQUEST_TIME,
         );
         $account = user_save('', $edit);
         $user = $account;
@@ -164,7 +166,7 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
       drupal_set_message(t('Please complete the following registration form to create your new account on %site', array('%site' => variable_get('site_name', ''))));
     }
   }
-  
+
   if (!$success) {
     $_SESSION['twitter']['values'] = $response;
     drupal_goto('user/register');

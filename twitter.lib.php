@@ -237,7 +237,7 @@ class Twitter {
     }
 
     $response = drupal_http_request($url, $headers, $method, $data);
-    if (!$response->error) {
+    if (!isset($response->error)) {
       return $response->data;
     }
     else {
@@ -257,7 +257,15 @@ class Twitter {
 
     switch ($format) {
       case 'json':
-        return json_decode($response, TRUE);
+        if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+          // in_reply_to_id ?
+          // ALL integers?
+          $response = preg_replace('/"id":([0-9]*)/', '"id":"\1"', $response);
+          return json_decode($response, TRUE);
+        }
+        else {
+          return json_decode($response, TRUE, 512, JSON_BIGINT_AS_STRING);
+        }
     }
   }
 
@@ -483,7 +491,7 @@ class TwitterUser {
     }
     $this->utc_offset = $values['utc_offset'];
 
-    if ($values['status']) {
+    if (isset($values['status'])) {
       $this->status = new TwitterStatus($values['status']);
     }
   }
@@ -493,7 +501,9 @@ class TwitterUser {
   }
 
   public function set_auth($values) {
-    $this->password = $values['password'];
+    if ( isset($values['password']) ) {
+      $this->password = $values['password'];
+    }
     $this->oauth_token = $values['oauth_token'];
     $this->oauth_token_secret = $values['oauth_token_secret'];
   }

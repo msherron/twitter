@@ -11,27 +11,9 @@
  * @{
  */
 
-/**
- * Implementation of hook_views_handlers()
- */
-function twitter_views_handlers() {
-  return array(
-    'handlers' => array(
-      'twitter_views_handler_field_profile_image' => array(
-        'parent' => 'views_handler_field',
-        'file' => 'twitter_views_field_handlers.inc',
-      ),
-      'twitter_views_handler_field_xss' => array(
-        'parent' => 'views_handler_field',
-        'file' => 'twitter_views_field_handlers.inc',
-      ),
-    ),
-  );
-}
-
 
 /**
- * Implementation of hook_views_data()
+ * Implements hook_views_data().
  */
 function twitter_views_data() {
   // Basic table information.
@@ -297,6 +279,10 @@ function twitter_views_data() {
 }
 
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function twitter_views_data_alter(&$data) {
   $data['users']['table']['join']['twitter'] = array(
     'left_table' => 'twitter_account',
