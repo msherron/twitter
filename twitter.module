@@ -229,3 +229,12 @@ function _twitter_use_oauth() {
 function twitter_views_api() {
   return array('api' => 2);
 }
+
+/**
+ * Implements hook_admin_paths_alter().
+ *
+ * OAuth callback disagrees with overlay.
+ */
+function twitter_admin_paths_alter(&$paths) {
+  $paths['user/*/edit/twitter'] = FALSE;
+}
