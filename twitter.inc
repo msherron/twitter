@@ -28,10 +28,9 @@ function twitter_connect($account) {
 function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL) {
   $values = (array) $twitter_user;
   $values['twitter_uid'] = $values['id'];
-  // Prevent "Incorrect integer value: '' for column 'xxx'" in db_merge().
   foreach (array('protected', 'verified') as $k) {
-    if (isset($values[$k]) && empty($values[$k])) {
-      $values[$k] = 0;
+    if (isset($values[$k])) {
+      $values[$k] = (int) $values[$k];
     }
   }
 
