@@ -28,7 +28,7 @@ function twitter_connect($account) {
 function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL) {
   $values = (array) $twitter_user;
   $values['twitter_uid'] = $values['id'];
-  foreach (array('protected', 'verified') as $k) {
+  foreach (array('protected', 'verified', 'profile_background_tile') as $k) {
     if (isset($values[$k])) {
       $values[$k] = (int) $values[$k];
     }
@@ -64,8 +64,6 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
  * @return
  *   TwitterUser object
  *
- * @todo How well does this handle the Twitter UID not being in the
- *       DB?
  */
 function twitter_account_load($id) {
   module_load_include('lib.php', 'twitter');
