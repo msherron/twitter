@@ -67,31 +67,36 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
  */
 function twitter_account_load($id) {
   module_load_include('lib.php', 'twitter');
-  $values = db_query("SELECT * FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $id))->fetchAssoc();
-  $values['id'] = $values['twitter_uid'];
-  $account = new TwitterUser($values);
-  $account->set_auth($values);
-  $account->uid = $values['uid'];
-  $account->import = $values['import'];
-  $account->is_global = $values['is_global'];
-  return $account;
+  if ( $values = db_query("SELECT * FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $id))->fetchAssoc() ) {
+    $values['id'] = $values['twitter_uid'];
+    $account = new TwitterUser($values);
+    $account->set_auth($values);
+    $account->uid = $values['uid'];
+    $account->import = $values['import'];
+    $account->is_global = $values['is_global'];
+    return $account;
+  }
 }
 
 /**
  * Saves a TwitterStatus object to {twitter}
  */
 function twitter_status_save($status) {
-  $status->twitter_id = $status->id;
-  $status->screen_name = $status->user->screen_name;
-  $status->created_time = strtotime($status->created_at);
-
-  if (db_query("SELECT 1 FROM {twitter} WHERE twitter_id = :twitter_id", array(':twitter_id' => $status->id))->fetchField()) {
-    drupal_write_record('twitter', $status, array('twitter_id'));
-  }
-  else {
-    drupal_write_record('twitter', $status);
-  }
-
+  $status = array(
+    'twitter_id' => $status->id,
+    'screen_name' => $status->user->screen_name,
+    'created_time' => strtotime($status->created_at),
+    'text' => $status->text,
+    'source' => $status->source,
+    'in_reply_to_status_id' => ($status->in_reply_to_status_id > 0) ? (string) $status->in_reply_to_status_id : NULL,
+    'in_reply_to_user_id' => (int) $status->in_reply_to_user_id,
+    'in_reply_to_screen_name' => $status->in_reply_to_screen_name,
+    'truncated' => (int) $status->truncated,
+  );
+  db_merge('twitter')
+    ->key(array('twitter_id' => $status['twitter_id']))
+    ->fields($status)
+    ->execute();
 }
 
 /**

@@ -131,13 +131,13 @@ function twitter_filter_info() {
   $filters['twitter_username'] = array(
     'title' => t('Twitter @username converter'),
     'description' => t('Converts Twitter-style @usernames into links to Twitter account pages.'),
-    'process callback' => 'twitter_link_filter',
+    'process callback' => 'twitter_filter_link',
     'tips callback' => 'twitter_filter_tip_username',
   );
   $filters['twitter_hashtag'] = array(
     'title' => t('Twitter #hashtag converter'),
     'description' => t('Converts Twitter-style #hashtags into links to hashtags.org.'),
-    'process callback' => 'twitter_link_filter',
+    'process callback' => 'twitter_filter_link',
     'tips callback' => 'twitter_filter_tip_hashtag',
   );
   return $filters;
@@ -161,7 +161,7 @@ function twitter_filter_tip_hashtag($format, $long = FALSE) {
  * This helper function converts Twitter-style @usernames and #hashtags into
  * actual links.
  */
-function twitter_link_filter($text, $prefix = '@', $destination = 'http://twitter.com/') {
+function twitter_filter_link($text, $prefix = '@', $destination = 'http://twitter.com/') {
   $matches = array(
     '/\>' . $prefix . '([a-z0-9_]+)/i',
     '/^' . $prefix . '([a-z0-9_]+)/i',
@@ -193,11 +193,8 @@ function twitter_user_load($accounts) {
 function twitter_twitter_accounts($account) {
   module_load_include('inc', 'twitter');
 
-  $twitter_accounts = array();
-
-  $query = db_select('twitter_account', 'ta');
-  $query->addField('ta', 'twitter_uid');
-  $query->condition('ta.uid', $account->uid);
+  $query = db_select('twitter_account', 'ta')
+    ->fields('ta', array('twitter_uid'));
   if (user_access('use global twitter account')) {
     $or = db_or();
     $or->condition('ta.uid', $account->uid);
@@ -208,11 +205,10 @@ function twitter_twitter_accounts($account) {
     $query->condition('ta.uid', $account->uid);
   }
 
-  $twitter_uids = $query->execute()->fetchCol();
-  foreach ($twitter_uids as $twitter_uid) {
+  $twitter_accounts = array();
+  foreach ($query->execute()->fetchCol() as $twitter_uid) {
     $twitter_accounts[] = twitter_account_load($twitter_uid);
   }
-
   return $twitter_accounts;
 }
 

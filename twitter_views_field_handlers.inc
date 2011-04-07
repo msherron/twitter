@@ -48,10 +48,10 @@ class twitter_views_handler_field_xss extends views_handler_field {
      $value = _filter_url($value, $filter);
     }
     if (!empty($this->options['link_usernames'])) {
-      $value = twitter_link_filter($value);
+      $value = twitter_filter_link($value);
     }
     if (!empty($this->options['link_hashtags']) && valid_url($this->options['hashtags_url'])) {
-      $value = twitter_link_filter($value, '#', url($this->options['hashtags_url']));
+      $value = twitter_filter_link($value, '#', url($this->options['hashtags_url']));
     }
     return filter_xss($value);
   }
