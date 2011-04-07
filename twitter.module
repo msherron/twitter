@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Implements hook_meu().
+ * Implements hook_menu().
  */
 function twitter_menu() {
   $items['twitter/oauth'] = array(
@@ -55,8 +55,7 @@ function twitter_permission() {
       'title' => t('Add Twitter accounts'),
     ),
     'use global twitter account' => array(
-      'title' => t('Use global Twitter account'),
-      'description' => t('Use the site global Twitter account.'),
+      'title' => t('Use the site global Twitter account'),
     ),
     'make twitter accounts global' => array(
       'title' => t('Assign a Twitter account as the site global account.'),
