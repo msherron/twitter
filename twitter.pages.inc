@@ -350,9 +350,14 @@ function twitter_account_oauth_validate($form, &$form_state) {
 
   $key = variable_get('twitter_consumer_key', '');
   $secret = variable_get('twitter_consumer_secret', '');
+  if ($key == '' || $secret == '') {
+    form_set_error('', t('Please configure your Twitter consumer key and secret.'));
+  }
+
   $twitter = new TwitterOAuth($key, $secret);
   $token = $twitter->get_request_token();
 
+  $_SESSION['twitter_oauth']['account'] = user_load($form['uid']['#value']);  
   $_SESSION['twitter_oauth']['token'] = $token;
   $_SESSION['twitter_oauth']['destination'] = $_GET['q'];
   drupal_goto($twitter->get_authorize_url($token));
@@ -361,7 +366,7 @@ function twitter_account_oauth_validate($form, &$form_state) {
 /**
  * @TODO This code should probably be reviewed.
  *
- * Wrapper to calll drupal_form_submit() which wasn't required in D6.
+ * Wrapper to call drupal_form_submit() which wasn't required in D6.
  */
 function twitter_oauth_callback() {
   $form_state['values']['oauth_token'] = $_GET['oauth_token'];
@@ -390,25 +395,46 @@ function twitter_oauth_callback_form_validate($form, &$form_state) {
   $key = variable_get('twitter_consumer_key', '');
   $secret = variable_get('twitter_consumer_secret', '');
 
-  $form_state['twitter_oauth'] = $_SESSION['twitter_oauth'];
-  unset($_SESSION['twitter_oauth']);
-
-  $token = $form_state['twitter_oauth']['token'];
-  if (!is_array($token) || !$key || !$secret) {
-    form_set_error('oauth_token', t('Invalid Twitter OAuth request'));
+  if ($key == '' || $secret == '') {
+    form_set_error('', t('Please configure your Twitter consumer key and secret.'));
   }
 
-  if ($token['oauth_token'] != $form_state['values']['oauth_token']) {
-    form_set_error('oauth_token', t('Invalid OAuth token.'));
+  if (isset($_SESSION['twitter_oauth'])) {
+    $form_state['twitter_oauth'] = $_SESSION['twitter_oauth'];
+    unset($_SESSION['twitter_oauth']);
+  }
+  else {
+    form_set_error('oauth_token', 'Invalid Twitter OAuth request');
+  }
+
+  if (isset($form_state['twitter_oauth']['token'])) {
+    $token = $form_state['twitter_oauth']['token'];
+    if (!is_array($token) || !$key || !$secret) {
+      form_set_error('oauth_token', t('Invalid Twitter OAuth request'));
+    }
+    if ($token['oauth_token'] != $form_state['values']['oauth_token']) {
+      form_set_error('oauth_token', t('Invalid OAuth token.'));
+    }
+  }
+  else {
+    form_set_error('oauth_token', t('Invalid Twitter OAuth request'));
   }
 
   module_load_include('lib.php', 'oauth_common');
   module_load_include('lib.php', 'twitter');
   module_load_include('inc', 'twitter');
 
-  $twitter = new TwitterOAuth($key, $secret, $token['oauth_token'], $token['oauth_token_secret']);
-  $response = $twitter->get_access_token();
-  $form_state['twitter_oauth']['response'] = $response;
+  if ($twitter = new TwitterOAuth($key, $secret, $token['oauth_token'], $token['oauth_token_secret'])) {
+    if ($response = $twitter->get_access_token()) {
+      $form_state['twitter_oauth']['response'] = $response;
+    }
+    else {
+      form_set_error('oauth_token', t('Invalid Twitter OAuth request'));
+    }
+  }
+  else {
+    form_set_error('oauth_token', t('Invalid Twitter OAuth request'));
+  }
 }
 
 /**
@@ -428,17 +454,15 @@ function twitter_oauth_callback_form_submit(&$form, &$form_state) {
   $response = $form_state['twitter_oauth']['response'];
 
   $twitter = new TwitterOAuth($key, $secret, $response['oauth_token'], $response['oauth_token_secret']);
-  $account = $twitter->users_show($response['screen_name']);
-  $account->set_auth($response);
-  twitter_account_save($account, TRUE);
+  $twitter_account = $twitter->users_show($response['screen_name']);
+  $twitter_account->set_auth($response);
+  $account = $form_state['twitter_oauth']['account'];
+  twitter_account_save($twitter_account, TRUE, $account);
 
   $form['#programmed'] = FALSE;
 
-  global $user ;
-  if ( $user->uid ) {
-    $form_state['redirect'] = url('user/' . $user->uid . '/edit/twitter');
-  }
+  $form_state['redirect'] = url('user/' . $account->uid . '/edit/twitter');
   // redirect isn't firing - because we're using drupal_submit_form()?
   // - so adding drupal_goto() here (but not liking it).
-  drupal_goto('user/' . $user->uid . '/edit/twitter');
+  drupal_goto('user/' . $account->uid . '/edit/twitter');
 }
