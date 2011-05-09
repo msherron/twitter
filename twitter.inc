@@ -28,6 +28,7 @@ function twitter_connect($account) {
 function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL) {
   $values = (array) $twitter_user;
   $values['twitter_uid'] = $values['id'];
+  // bool => int for DB storage
   foreach (array('protected', 'verified', 'profile_background_tile') as $k) {
     if (isset($values[$k])) {
       $values[$k] = (int) $values[$k];
