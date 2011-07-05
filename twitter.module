@@ -30,7 +30,8 @@ function twitter_menu() {
     'title' => 'Twitter accounts',
     'page callback' => 'twitter_user_settings',
     'page arguments' => array(1),
-    'access arguments' => array('add twitter accounts'),
+    'access callback' => 'twitter_edit_access',
+    'access arguments' => array(1),
     'weight' => 10,
     'file' => 'twitter.pages.inc',
     'type' => MENU_LOCAL_TASK,
@@ -44,6 +45,13 @@ function twitter_menu() {
   );
 
   return $items;
+}
+
+/**
+ * Access callback for twitter account editing.
+ */
+function twitter_edit_access($account) {
+  return user_edit_access($account) && user_access('add twitter accounts');
 }
 
 /**
