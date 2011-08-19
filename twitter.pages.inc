@@ -316,14 +316,18 @@ function twitter_account_form_validate($form, &$form_state) {
     $verify = TRUE;
   }
 
+  $twitter = new Twitter($name, $pass);
   if ($verify) {
-    $twitter = new Twitter($name, $pass);
     $account = $twitter->verify_credentials();
     if (!$account) {
       form_set_error("password", t('Twitter authentication failed. Please check your account name and try again.'));
     }
-    $form_state['twitter_account'] = $account;
   }
+  else {
+    // if we're not verify credentials, simply load the user data, without oauth
+    $account = $twitter->users_show($name, false);
+  }
+  $form_state['twitter_account'] = $account;
 }
 
 /**

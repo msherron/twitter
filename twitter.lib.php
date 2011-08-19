@@ -153,7 +153,7 @@ class Twitter {
    *
    * @see http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-users%C2%A0show
    */
-  public function users_show($id) {
+  public function users_show($id, $use_auth = TRUE) {
     $params = array();
     if (is_numeric($id)) {
       $params['user_id'] = $id;
@@ -162,7 +162,7 @@ class Twitter {
       $params['screen_name'] = $id;
     }
 
-    $values = $this->call('users/show', $params, 'GET', TRUE);
+    $values = $this->call('users/show', $params, 'GET', $use_auth);
     return new TwitterUser($values);
   }
 
