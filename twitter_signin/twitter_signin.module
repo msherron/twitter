@@ -100,7 +100,7 @@ function twitter_signin_form_alter(&$form, $form_state, $form_id) {
     $items[] = twitter_signin_button();
 
     $form['twitter_signin'] = array(
-      '#value' => theme('item_list', array('items' => $items)),
+      '#markup' => theme('item_list', array('items' => $items)),
     );
   }
   elseif ($form_id == 'user_register' && isset($_SESSION['twitter']['values'])) {
