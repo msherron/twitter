@@ -194,6 +194,7 @@ class Twitter {
       }
     }
     catch (TwitterException $e) {
+      watchdog('twitter', '!message', array('!message' => $e->__toString()), WATCHDOG_ERROR);
       return FALSE;
     }
 
