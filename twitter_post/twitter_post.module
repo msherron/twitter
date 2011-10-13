@@ -9,7 +9,7 @@
  * Implements hook_menu().
  */
 function twitter_post_menu() {
-  $items['admin/config/twitter/post'] = array(
+  $items['admin/config/services/twitter/post'] = array(
     'title' => 'Post',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('twitter_post_admin_settings'),
