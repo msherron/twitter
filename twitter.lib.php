@@ -497,10 +497,7 @@ class TwitterUser {
   }
 
   public function set_auth($values) {
-    if ( isset($values['password']) ) {
-      $this->password = $values['password'];
-    }
-    $this->oauth_token = $values['oauth_token'];
-    $this->oauth_token_secret = $values['oauth_token_secret'];
+    $this->oauth_token = isset($values['oauth_token'])?$values['oauth_token']:NULL;
+    $this->oauth_token_secret = isset($values['oauth_token_secret'])?$values['oauth_token_secret']:NULL;
   }
 }
