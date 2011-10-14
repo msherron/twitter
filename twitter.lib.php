@@ -244,7 +244,7 @@ class Twitter {
     else {
       $error = $response->error;
       $data = $this->parse_response($response->data);
-      if ($data['error']) {
+      if (isset($data['error'])) {
         $error = $data['error'];
       }
       throw new TwitterException($error);
