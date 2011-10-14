@@ -276,11 +276,6 @@ function twitter_account_form($form, $form_state, $account = NULL) {
       '#required' => TRUE,
       '#title' => t('Twitter user name'),
     );
-    $form['password'] = array(
-      '#type' => 'password',
-      '#title' => t('Password'),
-      '#description' => t("If your Twitter account is protected, or you wish to post to Twitter from Drupal, you must enter the Twitter account's password."),
-    );
 
     $form['import'] = array(
       '#type' => 'checkbox',
@@ -288,7 +283,6 @@ function twitter_account_form($form, $form_state, $account = NULL) {
       '#default_value' => TRUE,
       '#access' => FALSE,
     );
-
   }
 
   $form['submit'] = array(
@@ -300,48 +294,19 @@ function twitter_account_form($form, $form_state, $account = NULL) {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Implements hook_FORM_ID_submit()
+ *
+ * Loads Twitter account details and adds them to the user account
  */
-function twitter_account_form_validate($form, &$form_state) {
+function twitter_account_form_submit($form, &$form_state) {
   module_load_include('lib.php', 'twitter');
   module_load_include('inc', 'twitter');
 
-  $verify = FALSE;
-
-  $pass = $form_state['values']['password'];
   $name = $form_state['values']['screen_name'];
-
-  if (!empty($pass)) {
-    $verify = TRUE;
-  }
-
-  $twitter = new Twitter($name, $pass);
-  if ($verify) {
-    $account = $twitter->verify_credentials();
-    if (!$account) {
-      form_set_error("password", t('Twitter authentication failed. Please check your account name and try again.'));
-    }
-  }
-  else {
-    // if we're not verify credentials, simply load the user data, without oauth
-    $account = $twitter->users_show($name, false);
-  }
-  $form_state['twitter_account'] = $account;
-}
-
-/**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
- */
-function twitter_account_form_submit($form, &$form_state) {
-  module_load_include('inc', 'twitter');
-
-  if (!empty($form_state['values']['screen_name'])) {
-    $account = $form_state['twitter_account'];
-    $account->set_auth($form_state['values']);
-    twitter_account_save($account, TRUE);
-  }
+  $twitter = new Twitter($name);
+  $account = $twitter->users_show($name, false);
+  $account->set_auth($form_state['values']);
+  twitter_account_save($account, TRUE);
 }
 
 /**
