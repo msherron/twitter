@@ -14,3 +14,15 @@ If you download the OAuth module, get the latest development version as the stab
 bug when cancelling an account. You can find it here: http://drupal.org/node/1167740
 
 Once OAuth has been enabled, go to admin/config/services/twitter and follow instructions.
+
+How to add a Twitter account to a Drupal user account
+=====================================================
+Read http://drupal.org/node/1253026 for details.
+
+How to post to Twitter
+======================
+1. Read the OAuth section to install and configure OAuth.
+2. Once OAuth has been configured, go to admin/config/services/twitter/post and select from which
+   node types a user may post to Twitter and the default message.
+3. Verify permissions at admin/people/permissions.
+4. Add a Twitter account and try to edit or post content.
