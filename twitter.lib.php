@@ -485,7 +485,7 @@ class TwitterUser {
     if ($values['created_at'] && $created_time = strtotime($values['created_at'])) {
       $this->created_time = $created_time;
     }
-    $this->utc_offset = $values['utc_offset'];
+    $this->utc_offset = $values['utc_offset']?$values['utc_offset']:0;
 
     if (isset($values['status'])) {
       $this->status = new TwitterStatus($values['status']);
