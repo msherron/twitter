@@ -91,7 +91,7 @@ function twitter_signin_form_alter(&$form, $form_state, $form_id) {
     return;
   }
 
-  if ($form_id == 'twitter_oauth_callback_form' && $_SESSION['twitter_oauth']['signin']) {
+  if ($form_id == 'twitter_oauth_callback_form' && isset($_SESSION['twitter_oauth']['signin'])) {
     $form['#submit'] = array_merge(array('twitter_signin_oauth_callback_submit'), $form['#submit']);
   }
 
