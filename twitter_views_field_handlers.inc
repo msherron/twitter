@@ -33,7 +33,7 @@ class twitter_views_handler_field_xss extends views_handler_field {
     $form['hashtags_url'] = array(
       '#type' => 'textfield',
       '#default_value' => $this->options['hashtags_url'],
-      '#process' => array('views_process_dependency'),
+      '#process' => array('ctools_dependent_process'),
       '#dependency' => array('edit-options-link-hashtags' => array(TRUE)),
     );
   }
