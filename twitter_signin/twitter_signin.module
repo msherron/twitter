@@ -91,7 +91,7 @@ function twitter_signin_form_alter(&$form, $form_state, $form_id) {
     return;
   }
 
-  if ($form_id == 'twitter_oauth_callback' && $_SESSION['twitter_oauth']['signin']) {
+  if ($form_id == 'twitter_oauth_callback_form' && $_SESSION['twitter_oauth']['signin']) {
     $form['#submit'] = array_merge(array('twitter_signin_oauth_callback_submit'), $form['#submit']);
   }
 
@@ -103,8 +103,8 @@ function twitter_signin_form_alter(&$form, $form_state, $form_id) {
       '#markup' => theme('item_list', array('items' => $items)),
     );
   }
-  elseif ($form_id == 'user_register' && isset($_SESSION['twitter']['values'])) {
-    $form['name']['#default_value'] = $_SESSION['twitter']['values']['screen_name'];
+  elseif ($form_id == 'user_register_form' && isset($_SESSION['twitter']['values'])) {
+    $form['account']['name']['#default_value'] = $_SESSION['twitter']['values']['screen_name'];
     $form['auth_twitter'] = array(
       '#type' => 'hidden',
       '#value' => $_SESSION['twitter']['values']['user_id'],
@@ -145,7 +145,7 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
     if (variable_get('twitter_signin_register', 0)) {
       // Check for a nickname collision
       $account = array_shift(user_load_multiple(array(), array('name' => $response['screen_name'])));
-      if (!$account->uid) {
+      if (empty($account->uid)) {
         $edit = array(
           'name' => $response['screen_name'],
           'pass' => user_password(),
@@ -156,6 +156,7 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
         );
         $account = user_save('', $edit);
         $user = $account;
+        $form_state['twitter_oauth']['account'] = $account;
         $success = TRUE;
       }
       else {
