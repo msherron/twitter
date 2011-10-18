@@ -26,3 +26,14 @@ How to post to Twitter
    node types a user may post to Twitter and the default message.
 3. Verify permissions at admin/people/permissions.
 4. Add a Twitter account and try to edit or post content.
+
+How to sign in with Twitter
+===========================
+Existing and new users can sign in with Twitter by enabling the twitter_signin module. The
+following scenarios are being contemplated so far:
+
+* A visitor logs in with his Twitter account and, once authenticated at Twitter.com, it fills his
+  email in the Drupal registration form and receives an email to log in and set his account
+  password.
+* An existing user with an already configured Twitter account can log in automatically by clicking
+  on the Sign in with Twitter button.
