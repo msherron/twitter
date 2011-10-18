@@ -46,15 +46,6 @@ function twitter_signin_block_view($delta) {
 }
 
 /**
- * Implements hook_user_insert().
- */
-function twitter_signin_user_insert(&$edit, $account, $category) {
-  if (isset($_SESSION['twitter']['values'])) {
-    unset($_SESSION['twitter']);
-  }
-}
-
-/**
  * returns an image link for signing in with twitter
  */
 function twitter_signin_button() {
@@ -173,4 +164,28 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
     $_SESSION['twitter']['values'] = $response;
     drupal_goto('user/register');
   }
+}
+
+/**
+ * Implements hook_user_insert()
+ *
+ * Relates a Twitter account with a created user account if the user
+ * signed in with Twitter but did not have an account in the site yet
+ */
+function twitter_signin_user_insert(&$edit, $account, $category) {
+  if (isset($_SESSION['twitter']['values'])) {
+    module_load_include('lib.php', 'twitter');
+    module_load_include('inc', 'twitter');
+    $key = variable_get('twitter_consumer_key', '');
+    $secret = variable_get('twitter_consumer_secret', '');
+    $response = $_SESSION['twitter']['values'];
+
+    $twitter = new TwitterOAuth($key, $secret, $response['oauth_token'], $response['oauth_token_secret']);
+    $twitter_account = $twitter->users_show($response['screen_name']);
+    $twitter_account->set_auth($response);
+    twitter_account_save($twitter_account, TRUE, $account);
+
+    unset($_SESSION['twitter']);
+  }
+
 }
