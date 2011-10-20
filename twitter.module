@@ -21,21 +21,24 @@ function twitter_menu() {
     'access arguments' => array('administer site configuration'),
     'file' => 'twitter.pages.inc',
   );
+
   $items['admin/config/services/twitter/default'] = array(
     'title' => 'Twitter',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
-  $items['user/%user/edit/twitter'] = array(
+  $items['user/%user_category/edit/twitter'] = array(
     'title' => 'Twitter accounts',
     'page callback' => 'twitter_user_settings',
     'page arguments' => array(1),
     'access callback' => 'twitter_edit_access',
     'access arguments' => array(1),
+    'load arguments' => array('%map', '%index'),
     'weight' => 10,
     'file' => 'twitter.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
+
   $items['user/%user/edit/twitter/global/%'] = array(
     'title' => 'Twitter accounts',
     'page callback' => 'drupal_get_form',
@@ -70,6 +73,19 @@ function twitter_permission() {
     ),
     'import own tweets' => array(
       'title' => t('Import own tweets to the site.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_user_categories().
+ */
+function twitter_user_categories() {
+  return array(
+    array(
+      'name' => 'twitter',
+      'title' => t('Twitter accounts'),
+      'weight' => 3,
     ),
   );
 }
