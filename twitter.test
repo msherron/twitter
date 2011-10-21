@@ -27,9 +27,9 @@ class TwitterTest extends DrupalWebTestCase {
   }
 
   /**
-   * Tests account addition
+   * Tests account addition without Oauth module activated
    */
-  public function testAccountAddition() {
+  public function testAccountAdditionNoOauth() {
     // Create user
     $this->user = $this->drupalCreateUser(array(
       'add twitter accounts',
@@ -37,7 +37,7 @@ class TwitterTest extends DrupalWebTestCase {
     ));
     $this->drupalLogin($this->user);
 
-    // Add twitter account
+    // Add a Twitter account
     $edit = array(
       'screen_name' => 'drupal',
     );
@@ -51,5 +51,12 @@ class TwitterTest extends DrupalWebTestCase {
     $this->drupalGet('user/' . $this->user->uid . '/tweets');
     $elements = $this->xpath('//div[contains(@class, "view-tweets")]/div/table');
     $this->assertTrue(count($elements), 'Tweets were loaded successfully.');
+    // Delete the Twitter account
+    $edit = array(
+      'accounts[0][delete]' => 1,
+    );
+    $this->drupalPost('user/' . $this->user->uid . '/edit/twitter',
+                      $edit, t('Save changes'));
+    $this->assertText(t('The Twitter account was deleted.'));
   }
 }
