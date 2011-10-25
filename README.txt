@@ -1,17 +1,13 @@
 Introduction
 ============
-Twitter module allows listing tweets in blocks or pages. Its integration with Views opens the
-door to all sorts of formatting (ie. as an automatic slideshow with views_slideshow). Other
-submodules allow posting to twitter, executing actions when tweeting or login with a Twitter
-account.
+Twitter module allows listing tweets in blocks or pages. Its integration with Views opens the door to all sorts of formatting (ie. as an automatic slideshow with views_slideshow). Other submodules allow posting to twitter, executing actions when tweeting or login with a Twitter account.
 
 OAuth
 =====
 Except for just listing tweets, OAuth module is required to authenticate against Twitter. If you 
 just want to list tweets in a block, follow the steps at http://drupal.org/node/1253026.
 
-If you download the OAuth module, get the latest development version as the stable one has a
-bug when cancelling an account. You can find it here: http://drupal.org/node/1167740
+When you download the OAuth module, get the latest stable release available at http://drupal.org/project/oauth
 
 Once OAuth has been enabled, go to admin/config/services/twitter and follow instructions.
 
@@ -29,11 +25,7 @@ How to post to Twitter
 
 How to sign in with Twitter
 ===========================
-Existing and new users can sign in with Twitter by enabling the twitter_signin module. The
-following scenarios are being contemplated so far:
+Existing and new users can sign in with Twitter by enabling the twitter_signin module. The following scenarios are being contemplated so far:
 
-* A visitor logs in with his Twitter account and, once authenticated at Twitter.com, it fills his
-  email in the Drupal registration form and receives an email to log in and set his account
-  password.
-* An existing user with an already configured Twitter account can log in automatically by clicking
-  on the Sign in with Twitter button.
+* A visitor logs in with his Twitter account and, once authenticated at Twitter.com, it fills his email in the Drupal registration form and receives an email to log in and set his account password.
+* An existing user with an already configured Twitter account can log in automatically by clicking on the Sign in with Twitter button.
