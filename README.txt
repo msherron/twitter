@@ -1,11 +1,11 @@
 Introduction
 ============
-Twitter module allows listing tweets in blocks or pages. Its integration with Views opens the door to all sorts of
-formatting (ie. as an automatic slideshow with views_slideshow). It also provides input filters to easily link
-Twitter accounts and Twitter hashtags within text.
+Twitter module allows listing tweets in blocks or pages. Its integration with Views opens the
+door to all sorts of formatting (ie. as an automatic slideshow with views_slideshow). It also
+provides useful input filters to easily link Twitter accounts and searches within text.
 
-Other submodules allow posting to twitter,
-executing actions when tweeting or login with a Twitter account.
+Twitter's submodules allow posting to twitter, executing actions/rules when tweeting or login
+with a Twitter account.
 
 OAuth
 =====
