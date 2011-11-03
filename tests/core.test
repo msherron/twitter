@@ -13,7 +13,7 @@ class TwitterTest extends DrupalWebTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => t('Twitter tests'),
+      'name' => t('Main functionality'),
       'description' => t('Tests main module functionality.'),
       'group' => t('Twitter'),
     );

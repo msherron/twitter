@@ -1,4 +1,11 @@
 <?php
+/**
+ * @file
+ * Provides API integration with the Twitter microblogging service.
+ */
+
+define('TWITTER_HOMEPAGE', 'http://twitter.com');
+define('TWITTER_SEARCH', 'http://twitter.com/search');
 
 /**
  * Implements hook_menu().
@@ -154,14 +161,14 @@ function twitter_filter_info() {
   $filters['twitter_username'] = array(
     'title' => t('Twitter @username converter'),
     'description' => t('Converts Twitter-style @usernames into links to Twitter account pages.'),
-    'process callback' => 'twitter_filter_link',
-    'tips callback' => 'twitter_filter_tip_username',
+    'process callback' => '_twitter_filter_username',
+    'tips callback' => '_twitter_filter_tip_username',
   );
   $filters['twitter_hashtag'] = array(
     'title' => t('Twitter #hashtag converter'),
     'description' => t('Converts Twitter-style #hashtags into links to hashtags.org.'),
-    'process callback' => 'twitter_filter_link',
-    'tips callback' => 'twitter_filter_tip_hashtag',
+    'process callback' => '_twitter_filter_hashtag',
+    'tips callback' => '_twitter_filter_tip_hashtag',
   );
   return $filters;
 }
@@ -169,34 +176,54 @@ function twitter_filter_info() {
 /**
  * Filter tips callback function for $filters[0] in hook_filter_info().
  */
-function twitter_filter_tip_username($format, $long = FALSE) {
+function _twitter_filter_tip_username($filter, $format, $long = FALSE) {
   return t('Twitter-style @usernames are linked to their Twitter account pages.');
 }
 
 /**
  * Filter tips callback function for $filters[1] in hook_filter_info().
  */
-function twitter_filter_tip_hashtag($format, $long = FALSE) {
+function _twitter_filter_tip_hashtag($format, $long = FALSE) {
   return t('Twitter-style #hashtags are linked to !url.', array('!url' => '<a href="http://search.twitter.com/">search.twitter.com</a>'));
+}
+
+/**
+ * Callback for twitter @username converter
+ */
+function _twitter_filter_username($text, $filter) {
+  $prefix = '@';
+  $destination = TWITTER_HOMEPAGE;
+  return _twitter_filter_text($text, $prefix, $destination);
+}
+
+/**
+ * Callback for twitter #hashtag converter
+ */
+function _twitter_filter_hashtag($text, $filter) {
+  $prefix = '#';
+  $destination = TWITTER_SEARCH;
+  return _twitter_filter_text($text, $prefix, $destination);
 }
 
 /**
  * This helper function converts Twitter-style @usernames and #hashtags into
  * actual links.
  */
-function twitter_filter_link($text, $prefix = '@', $destination = 'http://twitter.com/') {
+function _twitter_filter_text($text, $prefix, $destination) {
   $matches = array(
     '/\>' . $prefix . '([a-z0-9_]+)/i',
     '/^' . $prefix . '([a-z0-9_]+)/i',
     '/(\s+)' . $prefix . '([a-z0-9_]+)/i',
   );
   $replacements = array(
-    '><a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
-    '<a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
-    '${1}<a href="' . $destination . '${2}">' . $prefix . '${2}</a>',
+    '><a href="' . $destination . '/${1}">' . $prefix . '${1}</a>',
+    '<a href="' . $destination . '/${1}">' . $prefix . '${1}</a>',
+    '${1}<a href="' . $destination . '/${2}">' . $prefix . '${2}</a>',
   );
   return preg_replace($matches, $replacements, $text);
 }
+
+/**
 
 /**
  * Implements hook_user_load().
