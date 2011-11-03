@@ -1,6 +1,11 @@
 Introduction
 ============
-Twitter module allows listing tweets in blocks or pages. Its integration with Views opens the door to all sorts of formatting (ie. as an automatic slideshow with views_slideshow). Other submodules allow posting to twitter, executing actions when tweeting or login with a Twitter account.
+Twitter module allows listing tweets in blocks or pages. Its integration with Views opens the door to all sorts of
+formatting (ie. as an automatic slideshow with views_slideshow). It also provides input filters to easily link
+Twitter accounts and Twitter hashtags within text.
+
+Other submodules allow posting to twitter,
+executing actions when tweeting or login with a Twitter account.
 
 OAuth
 =====
@@ -14,6 +19,19 @@ Once OAuth has been enabled, go to admin/config/services/twitter and follow inst
 How to add a Twitter account to a Drupal user account
 =====================================================
 Read http://drupal.org/node/1253026 for details.
+
+How to use the username and hashtag input filters
+=================================================
+1. Go to admin/config/content/formats.
+2. Select the text format where you want to use the filters.
+3. At "Enabled filters" check the Twitter converters.
+
+After that, clear cache and try to create a page with the following body:
+
+#drupal @drupal
+
+The above links to a search in Twitter over the #drupal tag and a to the @drupal profile.
+These filters are avilable when configuring a tweets Views.
 
 How to post to Twitter
 ======================
