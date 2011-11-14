@@ -45,5 +45,10 @@ How to sign in with Twitter
 ===========================
 Existing and new users can sign in with Twitter by enabling the twitter_signin module. The following scenarios are being contemplated so far:
 
-* A visitor logs in with his Twitter account and, once authenticated at Twitter.com, it fills his email in the Drupal registration form and receives an email to log in and set his account password.
-* An existing user with an already configured Twitter account can log in automatically by clicking on the Sign in with Twitter button.
+* A visitor logs in with his Twitter account and, once authenticated at Twitter.com, he fills in
+  his email in the Drupal registration form and receives an email to log in and set his account
+  password.
+* An existing user signs in with Twitter and then logs in into his Drupal user account. This results
+  in the Twitter account getting related to the user account so next time Twitter sign in will work.
+* An existing user with an already configured Twitter account can log in automatically by clicking
+  on the Sign in with Twitter button.

@@ -122,9 +122,6 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
   }
   elseif ($uid = db_query("SELECT uid FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $response['user_id']))->fetchField()) {
     // We have an existing twitter account - set it up for login
-    // TODO Convert "user_load" to "user_load_multiple" if "$uid" is other than a uid.
-    // To return a single user object, wrap "user_load_multiple" with "array_shift" or equivalent.
-    // Example: array_shift(user_load_multiple(array(), $uid))
     $account = user_load($uid);
     $edit["authname_twitter"] = $response['user_id'];
     user_save($account, $edit);
