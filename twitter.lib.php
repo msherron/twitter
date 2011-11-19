@@ -27,7 +27,7 @@ class Twitter {
   /**
    * @var $host The host to query against
    */
-  protected $host = 'twitter.com';
+  protected $host;
 
   /**
    * @var $source the twitter api 'source'
@@ -51,6 +51,7 @@ class Twitter {
     if (!empty($username) && !empty($password)) {
       $this->set_auth($username, $password);
     }
+    $this->host = variable_get('twitter_host', 'api.twitter.com');
   }
 
   /**
@@ -350,7 +351,14 @@ class TwitterOAuth extends Twitter {
 
 class TwitterSearch extends Twitter {
 
-  protected $host = 'search.twitter.com';
+  protected $host;
+
+  /**
+   * Constructor for the Twitter class
+   */
+  public function __construct() {
+    $this->host = variable_get('twitter_search_host', 'search.twitter.com');
+  }
 
   public function search($params = array()) {
 
