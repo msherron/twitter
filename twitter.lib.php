@@ -70,6 +70,20 @@ class Twitter {
    */
   public function set_host($host) {
     $this->host = $host;
+    variable_set('twitter_host', 'api.twitter.com');
+  }
+
+  /**
+   * Get the Twitter API host URL
+   *
+   * @return
+   *   string with the host URL.
+   */
+  public function get_host() {
+    if ($this->host == '') {
+      $this->host = variable_get('twitter_host', 'api.twitter.com');
+    }
+    return $this->host;
   }
 
   /**
@@ -271,7 +285,7 @@ class Twitter {
       $format = $this->format;
     }
 
-    $url =  'http://'. $this->host .'/'. $path;
+    $url =  'http://' . $this->get_host() . '/'. $path;
     if (!empty($format)) {
       $url .= '.'. $this->format;
     }
