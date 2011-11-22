@@ -64,11 +64,11 @@ function twitter_views_default_views() {
                    if (!empty($uid)) {
                      $account = user_load($uid);
                      $twitter_accounts = twitter_twitter_accounts($account);
-                     if($twitter_accounts) {
-                       return true;
+                     if(count($twitter_accounts)) {
+                       return TRUE;
                      }
                      else {
-                       return false;
+                       return FALSE;
                      }
                    }',
       ),
