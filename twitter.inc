@@ -8,11 +8,11 @@
  * Connect to the API using the 'proper' version (Oauth vs. standard)
  */
 function twitter_connect($account) {
-  module_load_include('lib.php', 'twitter');
   $auth = $account->get_auth();
   if (_twitter_use_oauth() && $auth['oauth_token'] && $auth['oauth_token_secret']) {
     module_load_include('lib.php', 'oauth_common');
-    return new TwitterOAuth(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''), $auth['oauth_token'], $auth['oauth_token_secret']);
+    return new TwitterOAuth(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''),
+                            $auth['oauth_token'], $auth['oauth_token_secret']);
   }
   else if ($auth['password']) {
     return new Twitter($account->screen_name, $auth['password']);
@@ -67,7 +67,6 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
  *
  */
 function twitter_account_load($id) {
-  module_load_include('lib.php', 'twitter');
   if ( $values = db_query("SELECT * FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $id))->fetchAssoc() ) {
     $values['id'] = $values['twitter_uid'];
     $account = new TwitterUser($values);
@@ -104,8 +103,6 @@ function twitter_status_save($status) {
  * Post a message to twitter
  */
 function twitter_set_status($twitter_account, $status) {
-  module_load_include('lib.php', 'twitter');
-
   $twitter = twitter_connect($twitter_account);
   $twitter->status_update($status);
 }
