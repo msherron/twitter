@@ -4,8 +4,6 @@
  * Provides API integration with the Twitter microblogging service.
  */
 
-module_load_include('lib.php', 'twitter');
-
 /**
  * Implements hook_menu().
  */
