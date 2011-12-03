@@ -42,14 +42,24 @@ function twitter_actions_action_info() {
  *   Form definition.
  */
 function twitter_actions_set_status_action_form($context) {
+  $options = array();
+  $results = db_query("SELECT screen_name FROM {twitter_account}");
+  foreach ($results as $result) {
+    $options[$result->screen_name] = $result->screen_name;
+  }
   // Set default values for form.
   $form['screen_name'] = array(
-    '#type' => 'textfield',
+    '#type' => 'select',
     '#title' => t('Twitter account name'),
+    '#options'       => $options,
     '#default_value' => isset($context['screen_name']) ? $context['screen_name'] : '',
-    '#size' => 25,
     '#required' => TRUE,
   );
+
+  if (!count($options)) {
+    $form['screen_name']['#description'] = t('You first need to add a Twitter account to one of ' .
+                                             'your users with rights for posting to Twitter.');
+  }
 
   $form['message'] = array(
     '#type' => 'textarea',
@@ -72,10 +82,8 @@ function twitter_actions_set_status_action_form($context) {
  */
 function twitter_actions_set_status_action_validate($form, $form_state) {
   if (!_twitter_use_oauth()) {
-    form_set_error('screen_name', t('Oath has not yet been setup.'));
-  }
-  if (!db_query("SELECT twitter_uid FROM {twitter_account} WHERE screen_name = :screen_name", array(':screen_name' => $form_state['values']['screen_name']))->fetchField()) {
-    form_set_error('screen_name', t('Twitter authentication failed. Please check your account name and try again.'));
+    form_set_error('screen_name', t('Oauth has not been setup yet. Please go to !link and follow steps.',
+                                     array('!link' => l(t('Twitter settings'), 'admin/settings/twitter'))));
   }
 }
 
