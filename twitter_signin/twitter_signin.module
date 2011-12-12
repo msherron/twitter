@@ -46,9 +46,25 @@ function twitter_signin_block_view($delta) {
 }
 
 /**
- * returns an image link for signing in with twitter
+ * Returns an image link for signing in with twitter
  */
 function twitter_signin_button() {
+  return theme('twitter_signin_button');
+}
+
+/**
+ * Implements hook_theme()
+ */
+function twitter_signin_theme() {
+  return array(
+    'twitter_signin_button' => array(),
+  );
+}
+
+/**
+ * themable function for an image link for signing in with twitter
+ */
+function theme_twitter_signin_button() {
   $img = drupal_get_path('module', 'twitter_signin') . '/images/' . variable_get('twitter_signin_button', 'Sign-in-with-Twitter-lighter-small.png');
 
   return l(theme('image', array('path' => $img, 'alt' => t('Sign in with Twitter'))), 'twitter/redirect', array('html' => TRUE));
