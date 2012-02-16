@@ -144,9 +144,6 @@ function twitter_fetch_user_timeline($id) {
  *
  * @param $twitter_uid
  *   An integer with the Twitter UID.
- *
- * @param $screen_name
- *   Optional string with the user name.
  */
 function twitter_account_delete($twitter_uid) {
   $account = twitter_account_load($twitter_uid);
@@ -161,7 +158,7 @@ function twitter_account_delete($twitter_uid) {
   $query->condition('screen_name', $account->screen_name);
   $query->execute();
 
-  // Delete from {twitter_account}.
+  // Delete from {authmap}.
   $query = db_delete('authmap');
   $query->condition('authname', $twitter_uid);
   $query->condition('module', 'twitter');
