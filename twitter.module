@@ -217,9 +217,9 @@ function _twitter_filter_text($text, $prefix, $destination) {
     '/(\s+)' . $prefix . '([a-z0-9_]+)/i',
   );
   $replacements = array(
-    '><a href="' . $destination . '/${1}">' . $prefix . '${1}</a>',
-    '<a href="' . $destination . '/${1}">' . $prefix . '${1}</a>',
-    '${1}<a href="' . $destination . '/${2}">' . $prefix . '${2}</a>',
+    '><a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
+    '<a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
+    '${1}<a href="' . $destination . '${2}">' . $prefix . '${2}</a>',
   );
   return preg_replace($matches, $replacements, $text);
 }
