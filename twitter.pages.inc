@@ -414,15 +414,8 @@ function twitter_oauth_callback_form_validate($form, &$form_state) {
 /**
  * Handle a Twitter OAuth return request and store the account creds
  * in the DB. Redirects to user/%/edit/twitter
- *
- * @TODO Redirect better.
- *
- * I don't much like the use of drupal_goto() here as it might
- * interfere with other modules trying to piggyback on the form
- * submission, but setting $form['redirect'] was leaving us at the
- * twitter/oauth URL.
  */
-function twitter_oauth_callback_form_submit(&$form, &$form_state) {
+function twitter_oauth_callback_form_submit($form, &$form_state) {
   $key = variable_get('twitter_consumer_key', '');
   $secret = variable_get('twitter_consumer_secret', '');
   $response = $form_state['twitter_oauth']['response'];
@@ -433,10 +426,7 @@ function twitter_oauth_callback_form_submit(&$form, &$form_state) {
   $account = $form_state['twitter_oauth']['account'];
   twitter_account_save($twitter_account, TRUE, $account);
 
-  $form['#programmed'] = FALSE;
+  $form_state['programmed'] = FALSE;
 
-  $form_state['redirect'] = url('user/' . $account->uid . '/edit/twitter');
-  // redirect isn't firing - because we're using drupal_submit_form()?
-  // - so adding drupal_goto() here (but not liking it).
-  drupal_goto('user/' . $account->uid . '/edit/twitter');
+  $form_state['redirect'] = $form_state['twitter_oauth']['destination'];
 }
