@@ -55,6 +55,7 @@ function twitter_post_form_alter(&$form, $form_state, $form_id) {
     }
     $form['twitter'] = array(
       '#type' => 'fieldset',
+      '#group' => 'additional_settings',
       '#title' => t('Post to twitter.com'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
@@ -74,11 +75,11 @@ function twitter_post_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
- * Implementation of hook_node_insert().
+ * Implementation of hook_node_presave().
  *
  * Intercepts newly published nodes and posts noticed to Twitter.
  */
-function twitter_post_node_insert($node) {
+function twitter_post_node_presave($node) {
   if (!empty($node->status) && !empty($node->twitter) && !empty($node->twitter['post'])) {
     module_load_include('inc', 'twitter');
 
@@ -107,14 +108,6 @@ function twitter_post_node_insert($node) {
     }
   }
 }
-
-/**
- * Implementation of hook_node_update().
- */
-function twitter_post_node_update($node) {
-  twitter_post_node_insert($node);
-}
-
 
 /**
  * Generate a twitter posting form for the given user.
