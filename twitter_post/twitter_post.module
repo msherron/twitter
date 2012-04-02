@@ -154,9 +154,10 @@ function twitter_post_form($account = NULL) {
       );
     }
     else {
+      $options_keys = array_keys($options);
       $form['account'] = array(
         '#type' => 'value',
-        '#value' => array_pop(array_keys($options)),
+        '#value' => array_pop($options_keys),
       );
     }
     return $form;
