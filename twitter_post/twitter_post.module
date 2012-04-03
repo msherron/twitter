@@ -75,11 +75,11 @@ function twitter_post_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
- * Implementation of hook_node_presave().
+ * Implementation of hook_node_insert().
  *
  * Intercepts newly published nodes and posts noticed to Twitter.
  */
-function twitter_post_node_presave($node) {
+function twitter_post_node_insert($node) {
   if (!empty($node->status) && !empty($node->twitter) && !empty($node->twitter['post'])) {
     module_load_include('inc', 'twitter');
 
@@ -107,6 +107,13 @@ function twitter_post_node_presave($node) {
                            array('%code' => $result->code, '%error' => $result->error)), 'warning');
     }
   }
+}
+
+/**
+ * Implementation of hook_node_update().
+ */
+function twitter_post_node_update($node) {
+  twitter_post_node_insert($node);
 }
 
 /**
