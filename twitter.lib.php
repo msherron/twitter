@@ -199,6 +199,8 @@ class Twitter {
 
   /**
    * Perform a request
+   *
+   * @throws TwitterException
    */
   protected function request($url, $params = array(), $method = 'GET', $use_auth = FALSE) {
     $data = '';

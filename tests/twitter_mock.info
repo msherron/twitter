@@ -1,0 +1,5 @@
+name = Twitter Mock
+description = Sets up a mock web server to simulate API calls on tests
+core = 7.x
+dependencies[] = twitter
+dependencies[] = simpletest

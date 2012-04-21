@@ -23,7 +23,10 @@ class TwitterTest extends DrupalWebTestCase {
    * Prepares the testing environment
    */
   function setUp() {
-    parent::setUp('twitter', 'views');
+    parent::setUp('twitter', 'views', 'twitter_mock');
+    global $base_root;
+    $twitter_host = preg_replace('/^http:\/\//', '', $base_root);
+    variable_set('twitter_api', $twitter_host);
   }
 
   /**
