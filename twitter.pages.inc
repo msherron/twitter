@@ -43,6 +43,34 @@ function twitter_admin_form($form, &$form_state) {
     '#default_value' => variable_get('twitter_consumer_secret', NULL),
   );
 
+  // Twitter external settings.
+  $form['twitter'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Twitter Settings'),
+    '#description' => t('The following settings connect Twitter module with external APIs. ' .
+      'Change them if, for example, you want to use Identi.ca.'),
+  );
+  $form['twitter']['twitter_host'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Twitter host'),
+    '#default_value' => variable_get('twitter_host', TWITTER_HOST),
+  );
+  $form['twitter']['twitter_api'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Twitter API'),
+    '#default_value' => variable_get('twitter_api', TWITTER_API),
+  );
+  $form['twitter']['twitter_search'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Twitter search'),
+    '#default_value' => variable_get('twitter_search', TWITTER_SEARCH),
+  );
+  $form['twitter']['twitter_tinyurl'] = array(
+    '#type' => 'textfield',
+    '#title' => t('TinyURL'),
+    '#default_value' => variable_get('twitter_tinyurl', TWITTER_TINYURL),
+  );
+
   return system_settings_form($form);
 }
 

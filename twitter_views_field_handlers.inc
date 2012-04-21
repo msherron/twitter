@@ -5,12 +5,11 @@
  */
 class twitter_views_handler_field_xss extends views_handler_field {
   function option_definition() {
-    $conf = TwitterConf::instance();
     $options = parent::option_definition();
     $options['link_urls'] = array('default' => TRUE);
     $options['link_usernames'] = array('default' => TRUE);
     $options['link_hashtags'] = array('default' => FALSE);
-    $options['hashtags_url'] = array('default' => 'http://' . $conf->get('search') . '/search?q=%23');
+    $options['hashtags_url'] = array('default' => 'http://' . variable_get('twitter_search', TWITTER_SEARCH) . '/search?q=%23');
     return $options;
   }
 
@@ -49,8 +48,7 @@ class twitter_views_handler_field_xss extends views_handler_field {
      $value = _filter_url($value, $filter);
     }
     if (!empty($this->options['link_usernames'])) {
-      $conf = TwitterConf::instance();
-      $value = _twitter_filter_text($value, '@', 'http://' . $conf->get('host') . '/'); 
+      $value = _twitter_filter_text($value, '@', 'http://' . variable_get('twitter_host', TWITTER_HOST) . '/');
     } if (!empty($this->options['link_hashtags']) && valid_url($this->options['hashtags_url'])) {
       $value = _twitter_filter_text($value, '#', url($this->options['hashtags_url']));
     }

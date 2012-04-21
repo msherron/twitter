@@ -5,59 +5,6 @@
  */
 
 /**
- * Class TwitterConfig
- *
- * Singleton which stores common configuration
- * @see http://php.net/manual/en/language.oop5.patterns.php
- */
-class TwitterConf {
-  private static $instance;
-  private $attributes = array(
-    'host'     => 'twitter.com',
-    'api'      => 'api.twitter.com',
-    'search'   => 'search.twitter.com',
-    'tiny_url' => 'tinyurl.com',
-  );
-
-  private function __construct() {}
-
-  public static function instance() {
-    if (!isset(self::$instance)) {
-      $className = __CLASS__;
-      self::$instance = new $className;
-    }
-    return self::$instance;
-  }
-
-  /**
-   * Generic getter
-   *
-   * @param $attribute
-   *   string attribute name to return
-   * @return
-   *   mixed value or NULL
-   */
-  public function get($attribute) {
-    if (array_key_exists($attribute, $this->attributes)) {
-      return $this->attributes[$attribute];
-    }
-  }
-
-  /**
-   * Generic setter
-   * @param $attribute
-   *   string attribute name to be set
-   * @param $value
-   *   mixed value
-   */
-  public function set($attribute, $value) {
-    if (array_key_exists($attribute, $this->attributes)) {
-      $this->attributes[$attribute] = $value;
-    }
-  }
-}
-
-/**
  * Exception handling class.
  */
 class TwitterException extends Exception {}
@@ -303,8 +250,7 @@ class Twitter {
     if (is_null($format)) {
       $format = $this->format;
     }
-    $conf = TwitterConf::instance();
-    $url =  'http://'. $conf->get('api') .'/'. $path;
+    $url =  'http://'. variable_get('twitter_api', TWITTER_API) .'/'. $path;
     if (!empty($format)) {
       $url .= '.'. $this->format;
     }
