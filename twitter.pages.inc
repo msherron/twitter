@@ -43,7 +43,7 @@ function twitter_admin_form($form, &$form_state) {
     '#default_value' => variable_get('twitter_consumer_secret', NULL),
   );
 
-  // Twitter external settings.
+  // Twitter external APIs settings.
   $form['twitter'] = array(
     '#type' => 'fieldset',
     '#title' => t('Twitter Settings'),

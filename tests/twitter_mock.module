@@ -1,29 +1,35 @@
 <?php
-/* @file
-* Module for Mock Web Services.
-*
-* Allows easy testing of functions that call web services without depending
-* on the web service working at the time the test is performed.
-*
-* Call mock_web with a url of the form:
-*   mock_web?data=return-this-data&code=return-this-status
-* Return-this-status is returned as the HTTP status code in the header.
-* Return-this-data is returned after the headers.
-*
-* Note: Paramaters are used instead of RESTful arguments so that ebmedded
-* slashes can be part of the data returned. Remember that Apache won't
-* accept urlencoded slashes in certain configurations.
-*
-* @code
-* // Verify module handles 404 error.
-* $result = drupalGet(mock_web_url('', 404));
-* $this->assert...
-* @endcode
-*/
+/** @file
+ * Module for Mock Twitter API requests
+ *
+ * Allows easy testing of functions that call web services without depending
+ * on the web service working at the time the test is performed.
+ *
+ */
 
-/*
-* Implementation of hook_menu().
-*/
+/**
+ * Implements hook_enable().
+ *
+ * Sets the Twitter API host to be the local site.
+ */
+function twitter_mock_enable() {
+  global $base_root;
+  $twitter_host = preg_replace('/^http:\/\//', '', $base_root);
+  variable_set('twitter_api', $twitter_host);
+}
+
+/**
+ * Implements hook_disable().
+ *
+ * Sets the Twitter API host back to its default value
+ */
+function twitter_mock_disable() {
+  variable_del('twitter_api');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
 function twitter_mock_menu() {
   $items = array();
 
@@ -41,9 +47,9 @@ function twitter_mock_menu() {
   return $items;
 }
 
-/*
-* Menu page callback. Returns HTTP status and data based on url params.
-*/
+/**
+ * Menu page callback. Returns HTTP status and data based on url params.
+ */
 function twitter_mock_user_show() {
   if (isset($_GET['screen_name']) && ($_GET['screen_name'] == 'drupal')) {
     $response = <<<EOD
@@ -70,22 +76,4 @@ EOD;
   }
   print $response;
   exit(0);
-}
-
-/*
-* Utility function to easily construct a url for mock_web.
-*
-* @param $data
-*   This is the data you want returned.
-* @param $code
-*   The HTTP status code you want returned.
-* @return
-*   The constructed url that will return the above data and status code.
-*/
-function twitter_mock_url($data = '', $code = 200) {
-  return url('mock_web', array(
-    'absolute' => TRUE,
-    'query' => array('data' => $data, 'code' => $code)
-    )
-  );
 }
