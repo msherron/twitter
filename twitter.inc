@@ -97,6 +97,8 @@ function twitter_status_save($status) {
     ->key(array('twitter_id' => $status['twitter_id']))
     ->fields($status)
     ->execute();
+  // Let other modules know that an status has been just saved.
+  module_invoke_all('twitter_status_save', $status);
 }
 
 /**
