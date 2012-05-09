@@ -234,7 +234,7 @@ class Twitter {
     if (is_null($format)) {
       $format = $this->format;
     }
-    $url =  'http://'. variable_get('twitter_api', TWITTER_API) .'/'. $path;
+    $url =  'https://'. variable_get('twitter_api', TWITTER_API) .'/'. $path;
     if (!empty($format)) {
       $url .= '.'. $this->format;
     }
