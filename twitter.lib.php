@@ -74,24 +74,6 @@ class Twitter {
   }
 
   /**
-   * Fetch the public timeline
-   *
-   * @see http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-statuses-public_timeline
-   */
-  public function public_timeline() {
-    return $this->get_statuses('statuses/public_timeline');
-  }
-
-  /**
-   * Fetch the authenticated user's friends timeline
-   *
-   * @see http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-statuses-friends_timeline
-   */
-  public function friends_timeline($params = array()) {
-    return $this->get_statuses('statuses/friends_timeline', $params, TRUE);
-  }
-
-  /**
    * Fetch a user's timeline
    *
    * @see http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-statuses-user_timeline
