@@ -7,6 +7,18 @@ provides useful input filters to easily link Twitter accounts and searches withi
 Twitter's submodules allow posting to twitter, executing actions/rules when tweeting or login
 with a Twitter account.
 
+Installation
+============
+Twitter's REST API library is out of the module. Although this needs an extra step on installation,
+it makes the library reusable for both Drupal 6 and 6 versions and also other modules.
+
+To set it up, just download twitter.lib.php from https://github.com/juampy72/twitter-rest-php/downloads
+to your libraries directory (normally sites/all/libraries) so its final location is
+sites/all/libraries/twitter/twitter.lib.php
+
+To verify that it has been installed correctly, view the Status Report at
+http://yoursite/admin/reports/status.
+
 OAuth
 =====
 Except for just listing tweets, OAuth module is required to authenticate against Twitter. If you 

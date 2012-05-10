@@ -1,8 +1,7 @@
 <?php
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Addmin settings form for Twitter Signin
  */
 function twitter_signin_admin_settings($form, &$form_state) {
   $form = array();
