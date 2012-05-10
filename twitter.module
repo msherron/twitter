@@ -4,10 +4,10 @@
  * Provides API integration with the Twitter microblogging service.
  */
 
-define ('TWITTER_HOST',   'twitter.com');
-define ('TWITTER_API',    'api.twitter.com');
-define ('TWITTER_SEARCH', 'search.twitter.com');
-define ('TWITTER_TINYURL',   'tinyurl.com');
+define ('TWITTER_HOST',         'http://twitter.com');
+define ('TWITTER_API',          'https://api.twitter.com');
+define ('TWITTER_SEARCH',       'http://search.twitter.com');
+define ('TWITTER_TINYURL',      'http://tinyurl.com');
 
 /**
  * Implements hook_menu().
@@ -118,7 +118,7 @@ function twitter_shorten_url($url) {
     return shorten_url($url);
   }
   else {
-    $response = drupal_http_request("http://" . variable_get('twitter_tinyurl', TWITTER_TINYURL) . "/api-create.php?url=" . $url);
+    $response = drupal_http_request(variable_get('twitter_tinyurl', TWITTER_TINYURL) . "/api-create.php?url=" . $url);
     if ($response->code == 200) {
       return $response->data;
     }
@@ -195,7 +195,7 @@ function _twitter_filter_tip_hashtag($format, $long = FALSE) {
  */
 function _twitter_filter_username($text, $filter) {
   $prefix = '@';
-  $destination = 'http://' . variable_get('twitter_host', TWITTER_HOST) . '/';
+  $destination = variable_get('twitter_host', TWITTER_HOST) . '/';
   return _twitter_filter_text($text, $prefix, $destination);
 }
 
@@ -204,7 +204,7 @@ function _twitter_filter_username($text, $filter) {
  */
 function _twitter_filter_hashtag($text, $filter) {
   $prefix = '#';
-  $destination = 'http://' . variable_get('twitter_search', TWITTER_SEARCH) . '/search?q=%23';
+  $destination = variable_get('twitter_search', TWITTER_SEARCH) . '/search?q=%23';
   return _twitter_filter_text($text, $prefix, $destination);
 }
 

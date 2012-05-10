@@ -14,8 +14,7 @@
  */
 function twitter_mock_enable() {
   global $base_root;
-  $twitter_host = preg_replace('/^http:\/\//', '', $base_root);
-  variable_set('twitter_api', $twitter_host);
+  variable_set('twitter_api', $base_root);
 }
 
 /**
@@ -33,12 +32,12 @@ function twitter_mock_disable() {
 function twitter_mock_menu() {
   $items = array();
 
-  $items['users/show.json'] = array(
+  $items['1/users/show.json'] = array(
     'page callback' => 'twitter_mock_user_show',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
-  $items['statuses/user_timeline.json'] = array(
+  $items['1/statuses/user_timeline.json'] = array(
     'page callback' => 'twitter_mock_user_timeline',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
