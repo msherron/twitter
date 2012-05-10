@@ -4,6 +4,8 @@
  * Twitter API functions
  */
 
+require_once(libraries_get_path('twitter') . '/twitter.lib.php');
+
 /**
  * Connect to the API using the 'proper' version (Oauth vs. standard)
  */
