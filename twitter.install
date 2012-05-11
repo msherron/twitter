@@ -15,6 +15,9 @@ function twitter_requirements($phase) {
   $requirements = array();
   $t = get_t();
   if (($phase == 'runtime') || ($phase == 'install')) {
+    if (!module_exists('libraries')) {
+      module_enable(array('libraries'));
+    }
     if ($path = libraries_get_path('twitter')) {
       $library = $path . '/twitter.lib.php';
       $requirements['twitter'] = array('title' => $t('Twitter REST API library'));
