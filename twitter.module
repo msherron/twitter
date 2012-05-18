@@ -144,12 +144,7 @@ function twitter_cron() {
   module_load_include('inc', 'twitter');
   $result = db_query_range("SELECT twitter_uid FROM {twitter_account} WHERE import = :import ORDER BY last_refresh ASC", 0, 20, array(':import' => 1));
   foreach ($result as $account) {
-    try {
-      twitter_fetch_user_timeline($account->twitter_uid);
-    }
-    catch (Exception $e) {
-      watchdog_exception('twitter', $e);
-    }
+    twitter_fetch_user_timeline($account->twitter_uid);
   }
 
   // Nuke old statuses.
