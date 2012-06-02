@@ -53,6 +53,27 @@ function twitter_views_default_views() {
   $handler->display->display_options['fields']['text']['table'] = 'twitter';
   $handler->display->display_options['fields']['text']['field'] = 'text';
   $handler->display->display_options['fields']['text']['label'] = '';
+  $handler->display->display_options['fields']['text']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['text']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['text']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['text']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['text']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['text']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['text']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['text']['hide_alter_empty'] = 1;
+  $handler->display->display_options['fields']['text']['link_urls'] = 1;
+  $handler->display->display_options['fields']['text']['link_usernames'] = 1;
+  $handler->display->display_options['fields']['text']['link_hashtags'] = 1;
   /* Field: Twitter: Created time */
   $handler->display->display_options['fields']['created_time']['id'] = 'created_time';
   $handler->display->display_options['fields']['created_time']['table'] = 'twitter';
@@ -79,16 +100,16 @@ function twitter_views_default_views() {
   $handler->display->display_options['arguments']['uid']['specify_validation'] = 1;
   $handler->display->display_options['arguments']['uid']['validate']['type'] = 'php';
   $handler->display->display_options['arguments']['uid']['validate_options']['code'] = '$uid = arg(1);
-                     if (!empty($uid)) {
-                       $account = user_load($uid);
-                       $twitter_accounts = twitter_twitter_accounts($account);
-                       if(count($twitter_accounts)) {
-                         return TRUE;
-                       }
-                       else {
-                         return FALSE;
-                       }
-                     }';
+                       if (!empty($uid)) {
+                         $account = user_load($uid);
+                         $twitter_accounts = twitter_twitter_accounts($account);
+                         if(count($twitter_accounts)) {
+                           return TRUE;
+                         }
+                         else {
+                           return FALSE;
+                         }
+                       }';
   $handler->display->display_options['arguments']['uid']['break_phrase'] = 0;
   $handler->display->display_options['arguments']['uid']['not'] = 0;
   /* Filter criterion: Twitter: Protected status */
@@ -128,6 +149,27 @@ function twitter_views_default_views() {
   $handler->display->display_options['fields']['text']['table'] = 'twitter';
   $handler->display->display_options['fields']['text']['field'] = 'text';
   $handler->display->display_options['fields']['text']['label'] = '';
+  $handler->display->display_options['fields']['text']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['text']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['text']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['text']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['text']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['text']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['text']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['text']['hide_alter_empty'] = 1;
+  $handler->display->display_options['fields']['text']['link_urls'] = 1;
+  $handler->display->display_options['fields']['text']['link_usernames'] = 1;
+  $handler->display->display_options['fields']['text']['link_hashtags'] = 1;
   /* Field: Twitter: Created time */
   $handler->display->display_options['fields']['created_time']['id'] = 'created_time';
   $handler->display->display_options['fields']['created_time']['table'] = 'twitter';
@@ -136,6 +178,6 @@ function twitter_views_default_views() {
   $handler->display->display_options['fields']['created_time']['date_format'] = 'time ago';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
   $handler->display->display_options['block_description'] = 'User Tweets';
-   
+
   return array('tweets' => $view);
 }
