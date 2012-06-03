@@ -289,3 +289,15 @@ function twitter_views_api() {
 function twitter_admin_paths_alter(&$paths) {
   $paths['user/*/edit/twitter'] = FALSE;
 }
+
+/**
+ * Implements hook_user_delete().
+ *
+ * Removes user's Twitter accounts and tweets
+ */
+function twitter_user_delete($account) {
+  file_put_contents('/tmp/twitter.txt', print_r($account, TRUE));
+  foreach ($account->twitter_accounts as $twitter_account) {
+    twitter_account_delete($twitter_account->id);
+  }
+}
