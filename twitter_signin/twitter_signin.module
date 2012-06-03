@@ -136,7 +136,8 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
     user_external_login($account, $response);
     $success = TRUE;
   }
-  elseif ($uid = db_query("SELECT uid FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $response['user_id']))->fetchField()) {
+  elseif ($uid = db_query("SELECT uid FROM {twitter_account} WHERE twitter_uid = :twitter_uid",
+                          array(':twitter_uid' => $response['user_id']))->fetchField()) {
     // We have an existing twitter account - set it up for login
     $account = user_load($uid);
     $edit["authname_twitter"] = $response['user_id'];
@@ -151,17 +152,23 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
       // Check for a nickname collision
       $account = array_shift(user_load_multiple(array(), array('name' => $response['screen_name'])));
       if (empty($account->uid)) {
-        $edit = array(
-          'name' => $response['screen_name'],
-          'pass' => user_password(),
-          'init' => $response['screen_name'],
-          'status' => 1,
-          "authname_twitter" => $response['user_id'],
-          'access' => REQUEST_TIME,
-        );
-        $account = user_save('', $edit);
+        $password = user_password();
+        $account->name = $response['screen_name'];
+        $account->pass = $password;
+        $account->init = $response['screen_name'];
+        $account->status = 1;
+        $account->authname_twitter = $response['user_id'];
+        $account->access = REQUEST_TIME;
+        $account->is_new = TRUE;
+        $account = user_save($account);
         $user = $account;
         $form_state['twitter_oauth']['account'] = $account;
+        drupal_set_message(t('You have been automatically registered with the password !password. ' .
+          'Copy it to <a href="!link">set your account settings</a>.', array(
+            '!password' => $password,
+            '!link' => 'user/' . $account->uid . '/edit',
+          )
+        ));
         $success = TRUE;
       }
       else {
