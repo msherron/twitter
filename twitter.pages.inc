@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Page callbacks for Twitter module.
+ */
 
 /**
  * Form builder; Twitter settings form.
@@ -338,7 +342,7 @@ function twitter_account_form_submit($form, &$form_state) {
 
   $name = $form_state['values']['screen_name'];
   $twitter = new Twitter($name);
-  $account = $twitter->users_show($name, false);
+  $account = $twitter->users_show($name, FALSE);
   twitter_account_save($account, TRUE, user_load($form_state['values']['uid']));
 }
 

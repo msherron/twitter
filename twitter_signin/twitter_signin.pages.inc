@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Page callbacks for Twitter Signin module
+ */
 
 /**
  * @todo Please document this function.

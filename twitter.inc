@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * Twitter API functions
  */
 
@@ -14,7 +15,7 @@ function twitter_connect($account) {
     return new TwitterOAuth(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''),
                             $auth['oauth_token'], $auth['oauth_token_secret']);
   }
-  else if ($auth['password']) {
+  elseif ($auth['password']) {
     return new Twitter($account->screen_name, $auth['password']);
   }
   else {
