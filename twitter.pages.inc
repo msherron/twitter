@@ -375,6 +375,10 @@ function twitter_account_oauth_validate($form, &$form_state) {
  * Wrapper to call drupal_form_submit() which wasn't required in D6.
  */
 function twitter_oauth_callback() {
+  if (isset($_GET['denied']) || empty($_GET['oauth_token'])) {
+    drupal_set_message(t('The connection to Twitter failed. Please try again.'), 'error');
+    drupal_goto('<front>');
+  }
   $form_state['values']['oauth_token'] = $_GET['oauth_token'];
   drupal_form_submit('twitter_oauth_callback_form', $form_state);
 }
