@@ -104,10 +104,17 @@ function twitter_status_save($status) {
 
 /**
  * Post a message to twitter
+ *
+ * @param $twitter_account
+ *   object with a Twitter account.
+ * @param $status
+ *   string message to publish.
+ * @return
+ *   array response from Twitter API.
  */
 function twitter_set_status($twitter_account, $status) {
   $twitter = twitter_connect($twitter_account);
-  $twitter->status_update($status);
+  return $twitter->status_update($status);
 }
 
 /**
