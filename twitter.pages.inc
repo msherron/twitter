@@ -342,7 +342,12 @@ function twitter_account_form_submit($form, &$form_state) {
 
   $name = $form_state['values']['screen_name'];
   $twitter = new Twitter($name);
-  $account = $twitter->users_show($name, FALSE);
+  try {
+    $account = $twitter->users_show($name, FALSE);
+  } catch (TwitterException $e) {
+    form_set_error('screen_name', t('Request failed: @message.', array('@message' => $e->getMessage())));
+    return;
+  }
   twitter_account_save($account, TRUE, user_load($form_state['values']['uid']));
 }
 
@@ -457,12 +462,16 @@ function twitter_oauth_callback_form_submit($form, &$form_state) {
   $response = $form_state['twitter_oauth']['response'];
 
   $twitter = new TwitterOAuth($key, $secret, $response['oauth_token'], $response['oauth_token_secret']);
-  $twitter_account = $twitter->users_show($response['screen_name']);
+  try {
+    $twitter_account = $twitter->users_show($response['screen_name']);
+  } catch (TwitterException $e) {
+    form_set_error('screen_name', t('Request failed: @message.', array('@message' => $e->getMessage())));
+    return;
+  }
   $twitter_account->set_auth($response);
   $account = $form_state['twitter_oauth']['account'];
   twitter_account_save($twitter_account, TRUE, $account);
 
   $form_state['programmed'] = FALSE;
-
   $form_state['redirect'] = $form_state['twitter_oauth']['destination'];
 }

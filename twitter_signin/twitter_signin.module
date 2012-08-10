@@ -221,12 +221,16 @@ function _twitter_signin_add_account($account) {
     $response = $_SESSION['twitter']['values'];
 
     $twitter = new TwitterOAuth($key, $secret, $response['oauth_token'], $response['oauth_token_secret']);
-    $twitter_account = $twitter->users_show($response['screen_name']);
+    try {
+      $twitter_account = $twitter->users_show($response['screen_name']);
+    } catch (TwitterException $e) {
+      drupal_set_message(t('Request failed: @message.', array('@message' => $e->getMessage())), 'error');
+      return;
+    }
     $twitter_account->set_auth($response);
     twitter_account_save($twitter_account, TRUE, $account);
 
     unset($_SESSION['twitter']);
-
     drupal_set_message(t('You have related a Twitter account with your user. Next time you can sign in with Twitter.'));
   }
 }
