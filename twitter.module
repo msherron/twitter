@@ -218,9 +218,9 @@ function _twitter_filter_hashtag($text, $filter) {
  */
 function _twitter_filter_text($text, $prefix, $destination) {
   $matches = array(
-    '/\>' . $prefix . '([a-z0-9_]+)/i',
-    '/^' . $prefix . '([a-z0-9_]+)/i',
-    '/(\s+)' . $prefix . '([a-z0-9_]+)/i',
+    '/\>' . $prefix . '(\w+)/ui',
+    '/^' . $prefix . '(\w+)/ui',
+    '/(\s+)' . $prefix . '(\w+)/ui',
   );
   $replacements = array(
     '><a href="' . $destination . '${1}" target="_blank">' . $prefix . '${1}</a>',
