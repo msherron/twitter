@@ -277,7 +277,7 @@ class TwitterOAuth extends Twitter {
    * @return
    *   string full URL
    */
-  protected function create_url($path, $format = NULL) {
+  protected function create_oauth_url($path, $format = NULL) {
     if (is_null($format)) {
       $format = $this->format;
     }
@@ -289,7 +289,7 @@ class TwitterOAuth extends Twitter {
   }
 
   public function get_request_token() {
-    $url = $this->create_url('oauth/request_token', '');
+    $url = $this->create_oauth_url('oauth/request_token', '');
     try {
       $response = $this->auth_request($url);
     }
@@ -301,21 +301,21 @@ class TwitterOAuth extends Twitter {
   }
 
   public function get_authorize_url($token) {
-    $url = $this->create_url('oauth/authorize', '');
+    $url = $this->create_oauth_url('oauth/authorize', '');
     $url.= '?oauth_token=' . $token['oauth_token'];
 
     return $url;
   }
 
   public function get_authenticate_url($token) {
-    $url = $this->create_url('oauth/authenticate', '');
+    $url = $this->create_oauth_url('oauth/authenticate', '');
     $url.= '?oauth_token=' . $token['oauth_token'];
 
     return $url;
   }
 
   public function get_access_token() {
-    $url = $this->create_url('oauth/access_token', '');
+    $url = $this->create_oauth_url('oauth/access_token', '');
     try {
       $response = $this->auth_request($url);
     }
