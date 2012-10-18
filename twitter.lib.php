@@ -85,7 +85,7 @@ class Twitter {
   /**
    * Fetch a user's timeline
    *
-   * @see http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-statuses-user_timeline
+   * @see https://dev.twitter.com/docs/api/1/get/statuses/user_timeline
    */
   public function user_timeline($id, $params = array(), $use_auth = FALSE) {
     if (is_numeric($id)) {
@@ -99,7 +99,7 @@ class Twitter {
 
   /**
    *
-   * @see http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-statuses-mentions
+   * @see https://dev.twitter.com/docs/api/1/get/statuses/mentions
    */
   public function mentions($params = array()) {
     return $this->get_statuses('statuses/mentions', $params, TRUE);
@@ -107,7 +107,7 @@ class Twitter {
 
   /**
    *
-   * @see http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-statuses%C2%A0update
+   * @see https://dev.twitter.com/docs/api/1/post/statuses/update
    */
   public function status_update($status, $params = array()) {
     $params['status'] = $status;
@@ -120,7 +120,7 @@ class Twitter {
 
   /**
    * Returns profile information about a user.
-   * @see http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-users%C2%A0show
+   * @see https://dev.twitter.com/docs/api/1/get/users/show
    */
   public function users_show($id, $use_auth = TRUE) {
     $params = array();
@@ -137,7 +137,7 @@ class Twitter {
 
   /**
    *
-   * @see http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-account%C2%A0verify_credentials
+   * @see https://dev.twitter.com/docs/api/1/get/account/verify_credentials
    */
   public function verify_credentials() {
     $values = $this->call('account/verify_credentials', array(), 'GET', TRUE);
