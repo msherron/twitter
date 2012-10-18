@@ -164,9 +164,9 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
         $user = $account;
         $form_state['twitter_oauth']['account'] = $account;
         drupal_set_message(t('You have been automatically registered with the password !password. ' .
-          'Copy it to <a href="!link">set your account settings</a>.', array(
+          'Copy it to !link.', array(
             '!password' => $password,
-            '!link' => 'user/' . $account->uid . '/edit',
+            '!link' => l('set your account settings', 'user/' . $account->uid . '/edit'),
           )
         ));
         $success = TRUE;
@@ -197,8 +197,8 @@ function twitter_signin_user_insert(&$edit, $account, $category) {
 }
 
 /**
- * Implements hook_user_insert().
- * 
+ * Implements hook_user_login().
+ *
  * Relates a Twitter account with an existing user account if the user
  * signed in with Twitter.
  */
