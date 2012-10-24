@@ -177,7 +177,7 @@ function theme_twitter_account_list_form($variables) {
 
   if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
     $header = array('', t('Name'), t('Description'), t('Private'), t('Import'), t('Delete'));
-  } 
+  }
   else {
     $header = array('', t('Name'), t('Description'), t('Private'), t('Delete'));
   }
@@ -368,7 +368,7 @@ function twitter_account_oauth_validate($form, &$form_state) {
   $twitter = new TwitterOAuth($key, $secret);
   $token = $twitter->get_request_token();
 
-  $_SESSION['twitter_oauth']['account'] = user_load($form['uid']['#value']);  
+  $_SESSION['twitter_oauth']['account'] = user_load($form['uid']['#value']);
   $_SESSION['twitter_oauth']['token'] = $token;
   $_SESSION['twitter_oauth']['destination'] = $_GET['q'];
   drupal_goto($twitter->get_authorize_url($token));
