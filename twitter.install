@@ -318,11 +318,19 @@ function twitter_uninstall() {
 }
 
 /**
- * Implements hook_update_N().
- *
  * Removes password field
  */
 function twitter_update_7300() {
   db_drop_field('twitter_account', 'password');
   return t('Password field was removed from Twitter accounts.');
+}
+
+/**
+ * Removes include_retweets field
+ */
+function twitter_update_7301() {
+  if (db_field_exists('twitter_account', 'include_retweets')) {
+    db_drop_field('twitter_account', 'include_retweets');
+    return t('Include Retweets field was removed from Twitter accounts.');
+  }
 }
