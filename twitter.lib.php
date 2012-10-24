@@ -15,7 +15,12 @@ class TwitterException extends Exception {
     watchdog('twitter', 'Unexpected error: @message', array(
       '@message' => $message,
     ), WATCHDOG_ERROR);
-    parent::__construct($message, $code, $previous);
+    if (is_null($previous)) {
+      parent::__construct($message, $code);
+    }
+    else {
+      parent::__construct($message, $code, $previous);
+    }
   }
 }
 /**
@@ -207,11 +212,16 @@ class Twitter {
       return $response->data;
     }
     else {
-      $error = $response->error;
+      $error = 'Unknown error.';
+      if (isset($response->error)) {
+        $error = $response->error;
+      }
       // Check if Twitter returned an error in the response data.
-      if (isset($response->data)) {
-        $data = $this->parse_response($response->data);
-        if (isset($data['errors'])) {
+      elseif (isset($response->data) && $data = $this->parse_response($response->data)) {
+        if (!is_array($data)) {
+          $error = 'Unable to parse response.';
+        }
+        elseif (isset($data['errors'][0]['message'])) {
           $error = $data['errors'][0]['message'];
         }
         elseif (isset($data['error'])) {
