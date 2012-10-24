@@ -111,6 +111,7 @@ class Twitter {
   }
 
   /**
+   * Post a new status.
    *
    * @see https://dev.twitter.com/docs/api/1/post/statuses/update
    */
@@ -119,8 +120,9 @@ class Twitter {
     if ($this->source) {
       $params['source'] = $this->source;
     }
-    $values = $this->call('statuses/update', $params, 'POST', TRUE);
-    return new TwitterStatus($values);
+    if ($values = $this->call('statuses/update', $params, 'POST', TRUE)) {
+      return new TwitterStatus($values);
+    }
   }
 
   /**
@@ -136,8 +138,9 @@ class Twitter {
       $params['screen_name'] = $id;
     }
 
-    $values = $this->call('users/show', $params, 'GET', $use_auth);
-    return new TwitterUser($values);
+    if ($values = $this->call('users/show', $params, 'GET', $use_auth)) {
+      return new TwitterUser($values);
+    }
   }
 
   /**
@@ -145,25 +148,38 @@ class Twitter {
    * @see https://dev.twitter.com/docs/api/1/get/account/verify_credentials
    */
   public function verify_credentials() {
-    $values = $this->call('account/verify_credentials', array(), 'GET', TRUE);
-    if (!$values) {
-      return FALSE;
+    if ($values = $this->call('account/verify_credentials', array(), 'GET', TRUE)) {
+      return new TwitterUser($values);
     }
-    return new TwitterUser($values);
   }
 
-
   /**
-   * Method for calling any twitter api resource
+   * Calls a twitter api resource
+   *
+   * @param $path
+   *   string REST resource to be called
+   * @param $params
+   *   array of settings to be sent along
+   * @param $method
+   *   string method to be used (GET or POST)
+   * @param $use_oauth
+   *   boolean indicating if the call should use OAuth authentication of not
    */
   public function call($path, $params = array(), $method = 'GET', $use_auth = FALSE) {
     $url = $this->create_url($path);
 
-    if ($use_auth) {
-      $response = $this->auth_request($url, $params, $method);
+    try {
+      if ($use_auth) {
+        $response = $this->auth_request($url, $params, $method);
+      }
+      else {
+        $response = $this->request($url, $params, $method);
+      }
     }
-    else {
-      $response = $this->request($url, $params, $method);
+    catch (TwitterException $e) {
+      watchdog('twitter', '!message', array('!message' => $e->__toString()), WATCHDOG_ERROR);
+      drupal_set_message('Twitter returned an error: ' . $e->getMessage(), 'error');
+      return FALSE;
     }
 
     if (!$response) {

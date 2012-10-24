@@ -98,13 +98,8 @@ function twitter_post_node_insert($node) {
     }
 
     $status = strtr($node->twitter['status'], $replacements);
-    try {
-      twitter_set_status($twitter_account, $status);
+    if (twitter_set_status($twitter_account, $status)) {
       drupal_set_message(t('Successfully posted to Twitter'));
-    }
-    catch (TwitterException $e) {
-      drupal_set_message(t('An error occurred when posting to Twitter: @message',
-                           array('@message' => $e->getMessage())), 'warning');
     }
   }
 }
