@@ -77,7 +77,7 @@ function twitter_post_form_alter(&$form, $form_state, $form_id) {
 /**
  * Implementation of hook_node_insert().
  *
- * Intercepts newly published nodes and posts noticed to Twitter.
+ * Intercepts newly published nodes and posts notices to Twitter.
  */
 function twitter_post_node_insert($node) {
   if (!empty($node->status) && !empty($node->twitter) && !empty($node->twitter['post'])) {

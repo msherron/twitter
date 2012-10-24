@@ -23,6 +23,7 @@ class TwitterException extends Exception {
     }
   }
 }
+
 /**
  * Primary Twitter API implementation class
  * Supports the full REST API for twitter.
@@ -127,6 +128,7 @@ class Twitter {
 
   /**
    * Returns profile information about a user.
+   *
    * @see https://dev.twitter.com/docs/api/1/get/users/show
    */
   public function users_show($id, $use_auth = TRUE) {
