@@ -216,16 +216,14 @@ class Twitter {
       if (isset($response->error)) {
         $error = $response->error;
       }
-      // Check if Twitter returned an error in the response data.
-      elseif (isset($response->data) && $data = $this->parse_response($response->data)) {
-        if (!is_array($data)) {
-          $error = 'Unable to parse response.';
-        }
-        elseif (isset($data['errors'][0]['message'])) {
-          $error = $data['errors'][0]['message'];
-        }
-        elseif (isset($data['error'])) {
-          $error = $data['error'];
+      if (isset($response->data) && $data = $this->parse_response($response->data)) {
+        if (is_array($data)) {
+          if (isset($data['errors'][0]['message'])) {
+            $error = $data['errors'][0]['message'];
+          }
+          elseif (isset($data['error'])) {
+            $error = $data['error'];
+          }
         }
       }
       throw new TwitterException($error);
