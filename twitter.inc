@@ -55,6 +55,11 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
     ->key(array('twitter_uid' => $values['twitter_uid']))
     ->fields($values)
     ->execute();
+
+  // Notify other modules of the twitter account save
+  if (!empty($account)) {
+    module_invoke_all('twitter_account_save', $account, $values);
+  }
 }
 
 /**
