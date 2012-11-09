@@ -15,22 +15,19 @@ function twitter_requirements($phase) {
   $requirements = array();
   $t = get_t();
   if (($phase == 'runtime') || ($phase == 'install')) {
-    if (!module_exists('libraries')) {
-      module_enable(array('libraries'));
-    }
-    if ($path = libraries_get_path('twitter')) {
-      $library = $path . '/twitter.lib.php';
-      $requirements['twitter'] = array('title' => $t('Twitter REST API library'));
-      if (!file_exists($path . '/twitter.lib.php')) {
-        $requirements['twitter']['value'] = $t('Missing');
-        $requirements['twitter']['description'] = $t('You must download it from ' .
-            '<a href="https://github.com/juampy72/twitter-rest-php/downloads" target="_blank">Github</a> and place it at !library',
-            array('!library' => $library));
-        $requirements['twitter']['severity'] = REQUIREMENT_ERROR;
-      } else {
-        $requirements['twitter']['value'] = $t('Installed');
-        $requirements['twitter']['severity'] = REQUIREMENT_OK;
-      }
+    $path = 'sites/all/libraries/twitter/twitter.lib.php';
+    $requirements['twitter'] = array('title' => $t('Twitter REST API library'));
+    if (!file_exists($path)) {
+      $requirements['twitter']['value'] = $t('Missing');
+      $requirements['twitter']['description'] = $t('The Twitter REST API is missing. ' .
+        'Download it from ' .
+        '<a href="https://github.com/juampy72/twitter-rest-php" target="_blank">' .
+        'https://github.com/juampy72/twitter-rest-php</a> and place it at !path',
+        array('!path' => $path));
+      $requirements['twitter']['severity'] = REQUIREMENT_ERROR;
+    } else {
+      $requirements['twitter']['value'] = $t('Installed');
+      $requirements['twitter']['severity'] = REQUIREMENT_OK;
     }
   }
   return $requirements;
