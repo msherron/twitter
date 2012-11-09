@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * Twitter API functions
  */
 
@@ -16,7 +17,7 @@ function twitter_connect($account) {
     return new TwitterOAuth(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''),
                             $auth['oauth_token'], $auth['oauth_token_secret']);
   }
-  else if ($auth['password']) {
+  elseif ($auth['password']) {
     return new Twitter($account->screen_name, $auth['password']);
   }
   else {
@@ -56,6 +57,11 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
     ->key(array('twitter_uid' => $values['twitter_uid']))
     ->fields($values)
     ->execute();
+
+  // Notify other modules of the twitter account save
+  if (!empty($account)) {
+    module_invoke_all('twitter_account_save', $account, $values);
+  }
 }
 
 /**
@@ -105,10 +111,17 @@ function twitter_status_save($status) {
 
 /**
  * Post a message to twitter
+ *
+ * @param $twitter_account
+ *   object with a Twitter account.
+ * @param $status
+ *   string message to publish.
+ * @return
+ *   array response from Twitter API.
  */
 function twitter_set_status($twitter_account, $status) {
   $twitter = twitter_connect($twitter_account);
-  $twitter->status_update($status);
+  return $twitter->status_update($status);
 }
 
 /**
@@ -126,7 +139,14 @@ function twitter_fetch_user_timeline($id) {
     $params['since_id'] = $since;
   }
 
-  $statuses = $twitter->user_timeline($account->id, $params, $account->protected);
+  if(get_class($twitter) == 'TwitterOAuth') {
+    $use_oauth = TRUE;
+  }
+  else {
+    $use_oauth = FALSE;
+  }
+
+  $statuses = $twitter->user_timeline($account->id, $params, $use_oauth);
   foreach ($statuses as $status) {
     twitter_status_save($status);
   }

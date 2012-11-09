@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Page callbacks for Twitter module.
+ */
 
 /**
  * Form builder; Twitter settings form.
@@ -173,7 +177,7 @@ function theme_twitter_account_list_form($variables) {
 
   if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
     $header = array('', t('Name'), t('Description'), t('Private'), t('Import'), t('Delete'));
-  } 
+  }
   else {
     $header = array('', t('Name'), t('Description'), t('Private'), t('Delete'));
   }
@@ -337,7 +341,12 @@ function twitter_account_form_submit($form, &$form_state) {
 
   $name = $form_state['values']['screen_name'];
   $twitter = new Twitter($name);
-  $account = $twitter->users_show($name, false);
+  try {
+    $account = $twitter->users_show($name, FALSE);
+  } catch (TwitterException $e) {
+    form_set_error('screen_name', t('Request failed: @message.', array('@message' => $e->getMessage())));
+    return;
+  }
   twitter_account_save($account, TRUE, user_load($form_state['values']['uid']));
 }
 
@@ -357,7 +366,7 @@ function twitter_account_oauth_validate($form, &$form_state) {
   $twitter = new TwitterOAuth($key, $secret);
   $token = $twitter->get_request_token();
 
-  $_SESSION['twitter_oauth']['account'] = user_load($form['uid']['#value']);  
+  $_SESSION['twitter_oauth']['account'] = user_load($form['uid']['#value']);
   $_SESSION['twitter_oauth']['token'] = $token;
   $_SESSION['twitter_oauth']['destination'] = $_GET['q'];
   drupal_goto($twitter->get_authorize_url($token));
@@ -369,6 +378,18 @@ function twitter_account_oauth_validate($form, &$form_state) {
  * Wrapper to call drupal_form_submit() which wasn't required in D6.
  */
 function twitter_oauth_callback() {
+  if (isset($_GET['denied']) || empty($_GET['oauth_token'])) {
+    drupal_set_message(t('The connection to Twitter failed. Please try again.'), 'error');
+    global $user;
+    if ($user->uid) {
+      // User is logged in, was attempting to OAuth a Twitter account.
+      drupal_goto('user/' . $user->uid . '/edit/twitter');
+    }
+    else {
+      // Anonymous user, redirect to front page.
+      drupal_goto('<front>');
+    }
+  }
   $form_state['values']['oauth_token'] = $_GET['oauth_token'];
   drupal_form_submit('twitter_oauth_callback_form', $form_state);
 }
@@ -446,7 +467,12 @@ function twitter_oauth_callback_form_submit($form, &$form_state) {
   $response = $form_state['twitter_oauth']['response'];
 
   $twitter = new TwitterOAuth($key, $secret, $response['oauth_token'], $response['oauth_token_secret']);
-  $twitter_account = $twitter->users_show($response['screen_name']);
+  try {
+    $twitter_account = $twitter->users_show($response['screen_name']);
+  } catch (TwitterException $e) {
+    form_set_error('screen_name', t('Request failed: @message.', array('@message' => $e->getMessage())));
+    return;
+  }
   $twitter_account->set_auth($response);
   $account = $form_state['twitter_oauth']['account'];
   twitter_account_save($twitter_account, TRUE, $account);

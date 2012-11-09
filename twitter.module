@@ -143,8 +143,12 @@ function twitter_cron() {
   // that the most out-of-date accounts get updated first.
   module_load_include('inc', 'twitter');
   $result = db_query_range("SELECT twitter_uid FROM {twitter_account} WHERE import = :import ORDER BY last_refresh ASC", 0, 20, array(':import' => 1));
-  foreach ($result as $account) {
-    twitter_fetch_user_timeline($account->twitter_uid);
+  try {
+    foreach ($result as $account) {
+      twitter_fetch_user_timeline($account->twitter_uid);
+    }
+  } catch (TwitterException $e) {
+    // The exception has already been logged so we do not need to do anything here apart from catching it.
   }
 
   // Nuke old statuses.
@@ -214,9 +218,9 @@ function _twitter_filter_hashtag($text, $filter) {
  */
 function _twitter_filter_text($text, $prefix, $destination) {
   $matches = array(
-    '/\>' . $prefix . '([a-z0-9_]+)/i',
-    '/^' . $prefix . '([a-z0-9_]+)/i',
-    '/(\s+)' . $prefix . '([a-z0-9_]+)/i',
+    '/\>' . $prefix . '(\w+)/ui',
+    '/^' . $prefix . '(\w+)/ui',
+    '/(\s+)' . $prefix . '(\w+)/ui',
   );
   $replacements = array(
     '><a href="' . $destination . '${1}" target="_blank">' . $prefix . '${1}</a>',
@@ -288,4 +292,15 @@ function twitter_views_api() {
  */
 function twitter_admin_paths_alter(&$paths) {
   $paths['user/*/edit/twitter'] = FALSE;
+}
+
+/**
+ * Implements hook_user_delete().
+ *
+ * Removes user's Twitter accounts and tweets
+ */
+function twitter_user_delete($account) {
+  foreach ($account->twitter_accounts as $twitter_account) {
+    twitter_account_delete($twitter_account->id);
+  }
 }

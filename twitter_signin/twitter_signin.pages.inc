@@ -1,7 +1,11 @@
 <?php
+/**
+ * @file
+ * Page callbacks for Twitter Signin module.
+ */
 
 /**
- * Addmin settings form for Twitter Signin
+ * Settings form for Twitter Signin.
  */
 function twitter_signin_admin_settings($form, &$form_state) {
   $form = array();
