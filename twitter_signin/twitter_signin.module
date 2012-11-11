@@ -184,6 +184,9 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
     $_SESSION['twitter']['values'] = $response;
     drupal_goto('user/register');
   }
+  else {
+    user_login_finalize();
+  }
 }
 
 /**
