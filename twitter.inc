@@ -118,7 +118,7 @@ function twitter_status_save($status) {
  */
 function twitter_set_status($twitter_account, $status) {
   $twitter = twitter_connect($twitter_account);
-  return $twitter->status_update($status);
+  return $twitter->statuses_update($status);
 }
 
 /**
