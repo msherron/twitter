@@ -271,14 +271,6 @@ function twitter_twitter_accounts($account) {
 }
 
 /**
- * Detect whether we should use oauth. This can probably just go now :)
- */
-function _twitter_use_oauth() {
-  return module_exists('oauth_common') && variable_get('twitter_consumer_key', '') &&
-         variable_get('twitter_consumer_secret', '');
-}
-
-/**
  * Implements hook_views_api().
  */
 function twitter_views_api() {

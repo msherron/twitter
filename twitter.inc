@@ -5,23 +5,20 @@
  * Twitter API functions
  */
 
+module_load_include('php', 'oauth_common', 'lib/OAuth');
 require_once(libraries_get_path('twitter') . '/twitter.lib.php');
 
 /**
- * Connect to the API using the 'proper' version (Oauth vs. standard)
+ * Connect to the Twitter API.
  */
 function twitter_connect($account) {
   $auth = $account->get_auth();
-  if (_twitter_use_oauth() && $auth['oauth_token'] && $auth['oauth_token_secret']) {
-    module_load_include('lib.php', 'oauth_common');
-    return new TwitterOAuth(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''),
+  if (isset($auth['oauth_token']) && isset($auth['oauth_token_secret'])) {
+    return new Twitter(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''),
                             $auth['oauth_token'], $auth['oauth_token_secret']);
   }
-  elseif ($auth['password']) {
-    return new Twitter($account->screen_name, $auth['password']);
-  }
   else {
-    return new Twitter;
+    return FALSE;
   }
 }
 
@@ -139,14 +136,7 @@ function twitter_fetch_user_timeline($id) {
     $params['since_id'] = $since;
   }
 
-  if(get_class($twitter) == 'TwitterOAuth') {
-    $use_oauth = TRUE;
-  }
-  else {
-    $use_oauth = FALSE;
-  }
-
-  $statuses = $twitter->user_timeline($account->id, $params, $use_oauth);
+  $statuses = $twitter->user_timeline($account->id, $params);
   foreach ($statuses as $status) {
     twitter_status_save($status);
   }

@@ -74,7 +74,6 @@ function theme_twitter_signin_button() {
  * Submit handler for Twitter signin.
  */
 function twitter_signin_redirect() {
-  module_load_include('lib.php', 'oauth');
   module_load_include('inc', 'twitter');
 
   $key = variable_get('twitter_consumer_key', '');
