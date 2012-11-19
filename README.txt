@@ -21,12 +21,12 @@ http://yoursite/admin/reports/status.
 
 OAuth
 =====
-Except for just listing tweets, OAuth module is required to authenticate against Twitter. If you 
-just want to list tweets in a block, follow the steps at http://drupal.org/node/1253026.
+OAuth module is required for all requests to the Twitter REST API 1.1.
 
 When you download the OAuth module, get the latest stable release available at http://drupal.org/project/oauth
 
-Once OAuth has been enabled, go to admin/config/services/twitter and follow instructions.
+Once OAuth has been enabled, go to admin/config/services/twitter and follow instructions in order
+to provide your Application keys.
 
 How to add a Twitter account to a Drupal user account
 =====================================================
