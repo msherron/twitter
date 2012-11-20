@@ -8,13 +8,12 @@
 
 /**
  * Implements hook_requirements()
- *
- * Checks the existance of the Twitter REST library
  */
 function twitter_requirements($phase) {
   $requirements = array();
   $t = get_t();
   if (($phase == 'runtime') || ($phase == 'install')) {
+    // Verify the existance of the Twitter REST library.
     $path = 'sites/all/libraries/twitter/twitter.lib.php';
     $requirements['twitter'] = array('title' => $t('Twitter REST API library'));
     if (!file_exists($path)) {
@@ -28,6 +27,26 @@ function twitter_requirements($phase) {
     } else {
       $requirements['twitter']['value'] = $t('Installed');
       $requirements['twitter']['severity'] = REQUIREMENT_OK;
+    }
+  }
+
+  if ($phase == 'runtime') {
+    // Verify that the Twitter Application keys are set.
+    $requirements['twitter_keys'] = array('title' => $t('Twitter Application keys'));
+    $consumer_key = variable_get('twitter_consumer_key', NULL);
+    $consumer_secret = variable_get('twitter_consumer_secret', NULL);
+    if (empty($consumer_key) || empty($consumer_secret)) {
+      $requirements['twitter_keys']['value'] = $t('Missing');
+      $requirements['twitter_keys']['description'] =
+        $t('In order to interact with Twitter, you need to create an application at ' .
+           '<a href="http://dev.twitter.com" target="_blank">http://dev.twitter.com</a> ' .
+           'and set the generated Application keys at the ' .
+           '<a href="/admin/config/services/twitter">Twitter settings page</a>');
+      $requirements['twitter_keys']['severity'] = REQUIREMENT_ERROR;
+    }
+    else {
+      $requirements['twitter_keys']['value'] = $t('Configured');
+      $requirements['twitter_keys']['severity'] = REQUIREMENT_OK;
     }
   }
   return $requirements;
