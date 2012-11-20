@@ -79,8 +79,7 @@ function twitter_admin_form($form, &$form_state) {
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Calls the form builder that lists Twitter accounts.
  */
 function twitter_user_settings($account) {
   module_load_include('inc', 'twitter');
@@ -169,7 +168,7 @@ function _twitter_account_list_row($account) {
 }
 
 /**
- * Theme the list of Twitter accounts.
+ * Themes the list of Twitter accounts.
  */
 function theme_twitter_account_list_form($variables) {
   $form = $variables['form'];
@@ -284,7 +283,7 @@ function twitter_user_make_global_submit($form, &$form_state) {
 }
 
 /**
- * Form to add a Twitter account
+ * Form to add a Twitter account.
  */
 function twitter_account_form($form, $form_state, $account = NULL) {
   if (empty($account)) {
@@ -324,8 +323,6 @@ function twitter_account_form_validate($form, &$form_state) {
  * Loads Twitter account details and adds them to the user account
  */
 function twitter_account_form_submit($form, &$form_state) {
-  module_load_include('inc', 'twitter');
-
   $key = variable_get('twitter_consumer_key', '');
   $secret = variable_get('twitter_consumer_secret', '');
   $twitter = new Twitter($key, $secret);
@@ -337,6 +334,7 @@ function twitter_account_form_submit($form, &$form_state) {
     drupal_goto($twitter->get_authorize_url($token));
   }
   else {
+    drupal_set_message(t('Could not obtain a valid token from the Twitter API. Please review the configuration.'), 'error');
   }
 }
 
@@ -381,10 +379,6 @@ function twitter_oauth_callback_form($form, &$form_state) {
 function twitter_oauth_callback_form_validate($form, &$form_state) {
   $key = variable_get('twitter_consumer_key', '');
   $secret = variable_get('twitter_consumer_secret', '');
-
-  if ($key == '' || $secret == '') {
-    form_set_error('', t('Please configure your Twitter consumer key and secret.'));
-  }
 
   if (isset($_SESSION['twitter_oauth'])) {
     $form_state['twitter_oauth'] = $_SESSION['twitter_oauth'];
