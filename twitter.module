@@ -175,18 +175,26 @@ function twitter_filter_info() {
     'process callback' => '_twitter_filter_hashtag',
     'tips callback' => '_twitter_filter_tip_hashtag',
   );
+  $filters['twitter_links'] = array(
+    'title' => t('Twitter link converter'),
+    'description' => t('Makes links in Twitter messages to be opened in new windows and adds ' .
+                       'rel="nofollow" so these links do not penalize SEO.'),
+    'process callback' => '_twitter_filter_link',
+    'tips callback' => '_twitter_filter_tip_link',
+  );
+
   return $filters;
 }
 
 /**
- * Filter tips callback function for $filters[0] in hook_filter_info().
+ * Filter tips callback function for Twitter usernames.
  */
 function _twitter_filter_tip_username($filter, $format, $long = FALSE) {
   return t('Twitter-style @usernames are linked to their Twitter account pages.');
 }
 
 /**
- * Filter tips callback function for $filters[1] in hook_filter_info().
+ * Filter tips callback function for Twitter hashtags.
  */
 function _twitter_filter_tip_hashtag($format, $long = FALSE) {
   return t('Twitter-style #hashtags are linked to !url.', array(
@@ -195,7 +203,14 @@ function _twitter_filter_tip_hashtag($format, $long = FALSE) {
 }
 
 /**
- * Callback for twitter @username converter
+ * Filter tips callback function for Twitter links.
+ */
+function _twitter_filter_tip_link($filter, $format, $long = FALSE) {
+  return t('Twitter message links are opened in new windows and rel="nofollow" is added.');
+}
+
+/**
+ * Callback for twitter @username converter.
  */
 function _twitter_filter_username($text, $filter) {
   $prefix = '@';
@@ -204,7 +219,7 @@ function _twitter_filter_username($text, $filter) {
 }
 
 /**
- * Callback for twitter #hashtag converter
+ * Callback for twitter #hashtag converter.
  */
 function _twitter_filter_hashtag($text, $filter) {
   $prefix = '#';
@@ -223,11 +238,18 @@ function _twitter_filter_text($text, $prefix, $destination) {
     '/(\s+)' . $prefix . '(\w+)/ui',
   );
   $replacements = array(
-    '><a href="' . $destination . '${1}" target="_blank">' . $prefix . '${1}</a>',
-    '<a href="' . $destination . '${1}" target="_blank">' . $prefix . '${1}</a>',
-    '${1}<a href="' . $destination . '${2}" target="_blank">' . $prefix . '${2}</a>',
+    '><a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
+    '<a href="' . $destination . '${1}">' . $prefix . '${1}</a>',
+    '${1}<a href="' . $destination . '${2}">' . $prefix . '${2}</a>',
   );
   return preg_replace($matches, $replacements, $text);
+}
+
+/**
+ * Callback for twitter link converter.
+ */
+function _twitter_filter_link($text, $filter) {
+  return str_replace("<a ", '<a target="_blank" rel="nofollow" ', $text);
 }
 
 /**

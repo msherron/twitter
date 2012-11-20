@@ -14,6 +14,7 @@ class twitter_views_handler_field_xss extends views_handler_field {
     $options['link_usernames'] = array('default' => TRUE);
     $options['link_hashtags'] = array('default' => FALSE);
     $options['hashtags_url'] = array('default' => variable_get('twitter_search', TWITTER_SEARCH) . '/search?q=%23');
+    $options['link_attributes'] = array('default' => TRUE);
     return $options;
   }
 
@@ -40,8 +41,16 @@ class twitter_views_handler_field_xss extends views_handler_field {
       '#process' => array('ctools_dependent_process'),
       '#dependency' => array('edit-options-link-hashtags' => array(TRUE)),
     );
+    $form['link_attributes'] = array(
+      '#title' => t('Open links in new windows/tabs and add rel="nofollow" attributes.'),
+      '#type' => 'checkbox',
+      '#default_value' => !empty($this->options['link_attributes']),
+    );
   }
 
+  /**
+   * Processes the message through the selected options.
+   */
   function render($values) {
     $value = $values->{$this->field_alias};
     if (!empty($this->options['link_urls'])) {
@@ -51,11 +60,19 @@ class twitter_views_handler_field_xss extends views_handler_field {
       );
      $value = _filter_url($value, $filter);
     }
+    // Link usernames with their profiles.
     if (!empty($this->options['link_usernames'])) {
       $value = _twitter_filter_text($value, '@', variable_get('twitter_host', TWITTER_HOST) . '/');
-    } if (!empty($this->options['link_hashtags']) && valid_url($this->options['hashtags_url'])) {
+    }
+    // Link hashtags.
+    if (!empty($this->options['link_hashtags']) && valid_url($this->options['hashtags_url'])) {
       $value = _twitter_filter_text($value, '#', url($this->options['hashtags_url']));
     }
+    // Add extra attributes to links.
+    if (!empty($this->options['link_attributes'])) {
+      $value = _twitter_filter_link($value, NULL);
+    }
+    // Avoid XSS within the message.
     return filter_xss($value);
   }
 }

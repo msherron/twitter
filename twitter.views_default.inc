@@ -4,7 +4,7 @@
  * Default views for Twitter module.
  */
 function twitter_views_default_views() {
-  $view = new view;
+  $view = new view();
   $view->name = 'tweets';
   $view->description = 'Displays Twitter.com status messages for users who have associated Twitter accounts.';
   $view->tag = '';
@@ -16,6 +16,7 @@ function twitter_views_default_views() {
 
   /* Display: Tweets */
   $handler = $view->new_display('default', 'Tweets', 'default');
+  $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'none';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
@@ -44,8 +45,6 @@ function twitter_views_default_views() {
       'separator' => '',
     ),
   );
-  $handler->display->display_options['style_options']['override'] = 1;
-  $handler->display->display_options['style_options']['sticky'] = 0;
   /* Field: Twitter: Profile image */
   $handler->display->display_options['fields']['profile_image_url']['id'] = 'profile_image_url';
   $handler->display->display_options['fields']['profile_image_url']['table'] = 'twitter_account';
@@ -56,27 +55,11 @@ function twitter_views_default_views() {
   $handler->display->display_options['fields']['text']['table'] = 'twitter';
   $handler->display->display_options['fields']['text']['field'] = 'text';
   $handler->display->display_options['fields']['text']['label'] = '';
-  $handler->display->display_options['fields']['text']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['trim_whitespace'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['text']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['text']['alter']['more_link'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['html'] = 0;
   $handler->display->display_options['fields']['text']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['text']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['text']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['text']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['text']['hide_alter_empty'] = 1;
   $handler->display->display_options['fields']['text']['link_urls'] = 1;
   $handler->display->display_options['fields']['text']['link_usernames'] = 1;
   $handler->display->display_options['fields']['text']['link_hashtags'] = 1;
+  $handler->display->display_options['fields']['text']['link_attributes'] = 1;
   /* Field: Twitter: Created time */
   $handler->display->display_options['fields']['created_time']['id'] = 'created_time';
   $handler->display->display_options['fields']['created_time']['table'] = 'twitter';
@@ -93,28 +76,26 @@ function twitter_views_default_views() {
   $handler->display->display_options['arguments']['uid']['table'] = 'users';
   $handler->display->display_options['arguments']['uid']['field'] = 'uid';
   $handler->display->display_options['arguments']['uid']['default_action'] = 'default';
-  $handler->display->display_options['arguments']['uid']['exception']['title_enable'] = 1;
+  $handler->display->display_options['arguments']['uid']['exception']['title_enable'] = TRUE;
   $handler->display->display_options['arguments']['uid']['exception']['title'] = 'All author';
-  $handler->display->display_options['arguments']['uid']['title_enable'] = 1;
+  $handler->display->display_options['arguments']['uid']['title_enable'] = TRUE;
   $handler->display->display_options['arguments']['uid']['title'] = '%1\'s tweets';
   $handler->display->display_options['arguments']['uid']['default_argument_type'] = 'user';
   $handler->display->display_options['arguments']['uid']['default_argument_options']['user'] = TRUE;
   $handler->display->display_options['arguments']['uid']['summary']['format'] = 'default_summary';
-  $handler->display->display_options['arguments']['uid']['specify_validation'] = 1;
+  $handler->display->display_options['arguments']['uid']['specify_validation'] = TRUE;
   $handler->display->display_options['arguments']['uid']['validate']['type'] = 'php';
   $handler->display->display_options['arguments']['uid']['validate_options']['code'] = '$uid = arg(1);
-                       if (!empty($uid)) {
-                         $account = user_load($uid);
-                         $twitter_accounts = twitter_twitter_accounts($account);
-                         if(count($twitter_accounts)) {
-                           return TRUE;
-                         }
-                         else {
-                           return FALSE;
-                         }
-                       }';
-  $handler->display->display_options['arguments']['uid']['break_phrase'] = 0;
-  $handler->display->display_options['arguments']['uid']['not'] = 0;
+                         if (!empty($uid)) {
+                           $account = user_load($uid);
+                           $twitter_accounts = twitter_twitter_accounts($account);
+                           if(count($twitter_accounts)) {
+                             return TRUE;
+                           }
+                           else {
+                             return FALSE;
+                           }
+                         }';
   /* Filter criterion: Twitter: Protected status */
   $handler->display->display_options['filters']['protected']['id'] = 'protected';
   $handler->display->display_options['filters']['protected']['table'] = 'twitter_account';
@@ -125,6 +106,7 @@ function twitter_views_default_views() {
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['path'] = 'user/%/tweets';
   $handler->display->display_options['menu']['type'] = 'tab';
   $handler->display->display_options['menu']['title'] = 'Twitter';
@@ -132,6 +114,7 @@ function twitter_views_default_views() {
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block');
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['use_more'] = FALSE;
   $handler->display->display_options['use_more'] = TRUE;
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
@@ -152,27 +135,11 @@ function twitter_views_default_views() {
   $handler->display->display_options['fields']['text']['table'] = 'twitter';
   $handler->display->display_options['fields']['text']['field'] = 'text';
   $handler->display->display_options['fields']['text']['label'] = '';
-  $handler->display->display_options['fields']['text']['alter']['alter_text'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['make_link'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['absolute'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['external'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['replace_spaces'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['trim_whitespace'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['nl2br'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['word_boundary'] = 1;
-  $handler->display->display_options['fields']['text']['alter']['ellipsis'] = 1;
-  $handler->display->display_options['fields']['text']['alter']['more_link'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['strip_tags'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['trim'] = 0;
-  $handler->display->display_options['fields']['text']['alter']['html'] = 0;
   $handler->display->display_options['fields']['text']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['text']['element_default_classes'] = 1;
-  $handler->display->display_options['fields']['text']['hide_empty'] = 0;
-  $handler->display->display_options['fields']['text']['empty_zero'] = 0;
-  $handler->display->display_options['fields']['text']['hide_alter_empty'] = 1;
   $handler->display->display_options['fields']['text']['link_urls'] = 1;
   $handler->display->display_options['fields']['text']['link_usernames'] = 1;
   $handler->display->display_options['fields']['text']['link_hashtags'] = 1;
+  $handler->display->display_options['fields']['text']['link_attributes'] = 1;
   /* Field: Twitter: Created time */
   $handler->display->display_options['fields']['created_time']['id'] = 'created_time';
   $handler->display->display_options['fields']['created_time']['table'] = 'twitter';
