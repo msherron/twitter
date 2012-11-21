@@ -49,6 +49,9 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
       unset($values[$k]);
     }
   }
+  if (!isset($values['uid'])) {
+    $values['uid'] = 0;
+  }
 
   db_merge('twitter_account')
     ->key(array('twitter_uid' => $values['twitter_uid']))
@@ -72,12 +75,13 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
  *
  */
 function twitter_account_load($id) {
-  if ( $values = db_query("SELECT * FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $id))->fetchAssoc() ) {
+  if ($values = db_query("SELECT * FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $id))->fetchAssoc()) {
     $values['id'] = $values['twitter_uid'];
     $account = new TwitterUser($values);
     $account->set_auth($values);
     $account->uid = $values['uid'];
     $account->import = $values['import'];
+    $account->mentions = $values['mentions'];
     $account->is_global = $values['is_global'];
     return $account;
   }
@@ -144,13 +148,24 @@ function twitter_fetch_user_timeline($id) {
   if (count($statuses) > 0) {
     twitter_account_save($statuses[0]->user);
   }
+}
 
-  db_update('twitter_account')
-    ->fields(array(
-      'last_refresh' => REQUEST_TIME,
-    ))
-    ->condition('twitter_uid', $account->id)
-    ->execute();
+/**
+ * Fetches user's mentions.
+ */
+function twitter_fetch_mentions_timeline($id) {
+  $account = twitter_account_load($id);
+  $twitter = twitter_connect($account);
+
+  $params = array();
+
+  $statuses = $twitter->mentions_timeline($params);
+  foreach ($statuses as $status) {
+    if (!twitter_account_load($status->user->id)) {
+      twitter_account_save($status->user);
+    }
+    twitter_status_save($status);
+  }
 }
 
 /**

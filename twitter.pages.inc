@@ -115,6 +115,9 @@ function twitter_account_list_form($form, $form_state, $twitter_accounts = array
   return $form;
 }
 
+/**
+ * Returns the form fields to manage a Twitter account.
+ */
 function _twitter_account_list_row($account) {
   $form['#account'] = $account;
 
@@ -156,8 +159,13 @@ function _twitter_account_list_row($account) {
   if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
     $form['import'] = array(
       '#type' => 'checkbox',
-      '#default_value' => user_access('import own tweets') ? $account->import : '',
+      '#default_value' => $account->import ? $account->import : '',
     );
+    $form['mentions'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => $account->mentions ? $account->mentions : '',
+    );
+
   }
 
   $form['delete'] = array(
@@ -174,7 +182,15 @@ function theme_twitter_account_list_form($variables) {
   $form = $variables['form'];
 
   if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
-    $header = array('', t('Name'), t('Description'), t('Private'), t('Import'), t('Delete'));
+    $header = array(
+      '',
+      t('Name'),
+      t('Description'),
+      t('Private'),
+      t('Import'),
+      t('Mentions'),
+      t('Delete'),
+    );
   }
   else {
     $header = array('', t('Name'), t('Description'), t('Private'), t('Delete'));
@@ -191,17 +207,20 @@ function theme_twitter_account_list_form($variables) {
     if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
       $row = array(
         drupal_render($element['image']),
-        drupal_render($element['id']) . drupal_render($element['screen_name']) . drupal_render($element['visible_name']),
+        drupal_render($element['id']) . drupal_render($element['screen_name']) .
+          drupal_render($element['visible_name']),
         drupal_render($element['description']),
         drupal_render($element['protected']),
         drupal_render($element['import']),
+        drupal_render($element['mentions']),
         drupal_render($element['delete']),
       );
     }
     else {
       $row = array(
         drupal_render($element['image']),
-        drupal_render($element['id']) . drupal_render($element['screen_name']) . drupal_render($element['visible_name']),
+        drupal_render($element['id']) . drupal_render($element['screen_name']) .
+          drupal_render($element['visible_name']),
         drupal_render($element['description']),
         drupal_render($element['protected']),
         drupal_render($element['delete']),
@@ -210,7 +229,8 @@ function theme_twitter_account_list_form($variables) {
 
     if (user_access('make twitter accounts global')) {
       $label = ($element['#account']->is_global) ? t('remove global') : t('make global');
-      $row[] = l($label, 'user/' . $element['#account']->uid . '/edit/twitter/global/' . $element['#account']->id);
+      $row[] = l($label, 'user/' . $element['#account']->uid . '/edit/twitter/global/' .
+        $element['#account']->id);
     }
 
     $rows[] = $row;
@@ -311,8 +331,8 @@ function twitter_account_form_validate($form, &$form_state) {
   $key = variable_get('twitter_consumer_key', '');
   $secret = variable_get('twitter_consumer_secret', '');
   if ($key == '' || $secret == '') {
-    form_set_error('', t('Please configure your consumer key and secret key at <a href="!url">Twitter settings</a>.', array(
-      '!url' => url('admin/config/services/twitter'),
+    form_set_error('', t('Please configure your consumer key and secret key at ' .
+      '<a href="!url">Twitter settings</a>.', array( '!url' => url('admin/config/services/twitter'),
     )));
   }
 }
@@ -334,7 +354,8 @@ function twitter_account_form_submit($form, &$form_state) {
     drupal_goto($twitter->get_authorize_url($token));
   }
   else {
-    drupal_set_message(t('Could not obtain a valid token from the Twitter API. Please review the configuration.'), 'error');
+    drupal_set_message(t('Could not obtain a valid token from the Twitter API. Please review the configuration.'),
+      'error');
   }
 }
 

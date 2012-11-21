@@ -142,10 +142,28 @@ function twitter_cron() {
   // sorted by how long it's been since we last updated them. This ensures
   // that the most out-of-date accounts get updated first.
   module_load_include('inc', 'twitter');
-  $result = db_query_range("SELECT twitter_uid FROM {twitter_account} WHERE import = :import ORDER BY last_refresh ASC", 0, 20, array(':import' => 1));
+  $result = db_query_range("SELECT twitter_uid
+                            FROM {twitter_account}
+                            WHERE import = :import
+                            AND oauth_token <> ''
+                            AND oauth_token_secret <> ''
+                            ORDER BY last_refresh ASC",
+                            0, 20, array(':import' => 1));
   try {
     foreach ($result as $account) {
+      // Fetch tweets and mentions.
       twitter_fetch_user_timeline($account->twitter_uid);
+      $twitter_account = twitter_account_load($account->twitter_uid);
+      if ($twitter_account->mentions) {
+        twitter_fetch_mentions_timeline($twitter_account->id);
+      }
+      // Mark the time this account was updated.
+      db_update('twitter_account')
+        ->fields(array(
+          'last_refresh' => REQUEST_TIME,
+        ))
+        ->condition('twitter_uid', $twitter_account->id)
+        ->execute();
     }
   } catch (TwitterException $e) {
     // The exception has already been logged so we do not need to do anything here apart from catching it.

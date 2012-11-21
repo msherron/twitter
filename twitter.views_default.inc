@@ -86,16 +86,16 @@ function twitter_views_default_views() {
   $handler->display->display_options['arguments']['uid']['specify_validation'] = TRUE;
   $handler->display->display_options['arguments']['uid']['validate']['type'] = 'php';
   $handler->display->display_options['arguments']['uid']['validate_options']['code'] = '$uid = arg(1);
-                         if (!empty($uid)) {
-                           $account = user_load($uid);
-                           $twitter_accounts = twitter_twitter_accounts($account);
-                           if(count($twitter_accounts)) {
-                             return TRUE;
-                           }
-                           else {
-                             return FALSE;
-                           }
-                         }';
+                           if (!empty($uid)) {
+                             $account = user_load($uid);
+                             $twitter_accounts = twitter_twitter_accounts($account);
+                             if(count($twitter_accounts)) {
+                               return TRUE;
+                             }
+                             else {
+                               return FALSE;
+                             }
+                           }';
   /* Filter criterion: Twitter: Protected status */
   $handler->display->display_options['filters']['protected']['id'] = 'protected';
   $handler->display->display_options['filters']['protected']['table'] = 'twitter_account';
@@ -104,8 +104,9 @@ function twitter_views_default_views() {
   $handler->display->display_options['filters']['protected']['group'] = '0';
   $handler->display->display_options['filters']['protected']['expose']['operator'] = FALSE;
 
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page');
+  /* Display: User tweets */
+  $handler = $view->new_display('page', 'User tweets', 'page');
+  $handler->display->display_options['display_description'] = 'Lists tweets made by a particular user.';
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['path'] = 'user/%/tweets';
   $handler->display->display_options['menu']['type'] = 'tab';
@@ -148,6 +149,13 @@ function twitter_views_default_views() {
   $handler->display->display_options['fields']['created_time']['date_format'] = 'time ago';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
   $handler->display->display_options['block_description'] = 'User Tweets';
+
+  /* Display: All tweets */
+  $handler = $view->new_display('page', 'All tweets', 'page_all_tweets');
+  $handler->display->display_options['display_description'] = 'Lists all unprotected tweets.';
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['defaults']['arguments'] = FALSE;
+  $handler->display->display_options['path'] = 'all-tweets';
 
   return array('tweets' => $view);
 }

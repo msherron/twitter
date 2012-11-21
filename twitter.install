@@ -308,6 +308,13 @@ function twitter_schema() {
         'not null' => TRUE,
         'default' => 1,
       ),
+      'mentions' => array(
+        'description' => "Boolean flag indicating whether the {twitter_user}'s mentions should be pulled in by the site.",
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'last_refresh' => array(
         'description' => "A UNIX timestamp marking the date Twitter statuses were last fetched on.",
         'type' => 'int',
@@ -379,4 +386,18 @@ function twitter_update_7301() {
     db_drop_field('twitter_account', 'include_retweets');
     return t('Include Retweets field was removed from Twitter accounts.');
   }
+}
+
+/**
+ * Adds field mentions to twitter_account table.
+ */
+function twitter_update_7400() {
+  $data = array(
+    'description' => "Boolean flag indicating whether the {twitter_user}'s mentions should be pulled in by the site.",
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  db_add_field('twitter_account', 'mentions', $data);
 }
