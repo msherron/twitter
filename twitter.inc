@@ -52,7 +52,6 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
   if (!isset($values['uid'])) {
     $values['uid'] = 0;
   }
-
   db_merge('twitter_account')
     ->key(array('twitter_uid' => $values['twitter_uid']))
     ->fields($values)
@@ -85,6 +84,25 @@ function twitter_account_load($id) {
     $account->is_global = $values['is_global'];
     return $account;
   }
+}
+
+/**
+ * Loads all Twitter accounts.
+ *
+ * @return
+ *   array of TwitterUser objects.
+ *
+ */
+function twitter_account_load_all() {
+  $accounts = array();
+  $result = db_query("SELECT twitter_uid
+                      FROM {twitter_account}
+                      WHERE oauth_token <> ''
+                      AND oauth_token_secret <> ''");
+  foreach ($result as $account) {
+    $accounts[] = twitter_account_load($account->twitter_uid);
+  }
+  return $accounts;
 }
 
 /**

@@ -23,11 +23,9 @@ function twitter_menu() {
   );
 
   $items['admin/config/services/twitter'] = array(
-    'title' => 'Twitter',
-    'description' => 'Configure integration with Twitter (and compatible) API services.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('twitter_admin_form'),
-    'access arguments' => array('administer site configuration'),
+    'title' => 'Twitter accounts',
+    'page callback' => 'twitter_user_settings',
+    'access arguments' => array('add twitter accounts'),
     'file' => 'twitter.pages.inc',
   );
 
@@ -36,34 +34,17 @@ function twitter_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
-  $items['user/%user_category/edit/twitter'] = array(
-    'title' => 'Twitter accounts',
-    'page callback' => 'twitter_user_settings',
-    'page arguments' => array(1),
-    'access callback' => 'twitter_edit_access',
-    'access arguments' => array(1),
-    'load arguments' => array('%map', '%index'),
-    'weight' => 10,
+  $items['admin/config/services/twitter/settings'] = array(
+    'title' => 'Settings',
+    'description' => 'Configure integration with Twitter (and compatible) API services.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('twitter_admin_form'),
+    'access arguments' => array('administer site configuration'),
     'file' => 'twitter.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
 
-  $items['user/%user/edit/twitter/global/%'] = array(
-    'title' => 'Twitter accounts',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('twitter_user_make_global', 1, 5),
-    'access arguments' => array('make twitter accounts global'),
-    'file' => 'twitter.pages.inc',
-  );
-
   return $items;
-}
-
-/**
- * Access callback for twitter account editing.
- */
-function twitter_edit_access($account) {
-  return user_edit_access($account) && user_access('add twitter accounts');
 }
 
 /**
@@ -82,19 +63,6 @@ function twitter_permission() {
     ),
     'import own tweets' => array(
       'title' => t('Import own tweets to the site.'),
-    ),
-  );
-}
-
-/**
- * Implements hook_user_categories().
- */
-function twitter_user_categories() {
-  return array(
-    array(
-      'name' => 'twitter',
-      'title' => t('Twitter accounts'),
-      'weight' => 3,
     ),
   );
 }
@@ -271,46 +239,6 @@ function _twitter_filter_link($text, $filter) {
 }
 
 /**
- * Implements hook_user_load().
- */
-function twitter_user_load($accounts) {
-  foreach ($accounts as $uid => $account) {
-    $accounts[$uid]->twitter_accounts = module_invoke_all('twitter_accounts', $account);
-  }
-}
-
-/**
- * An implementation of hook_twitter_accounts. We want to move this into a
- * separate module eventually, but sticking the code here and using a hook
- * lets other modules solve the 'what accounts can a user post with' problem
- * in cleaner ways.
- *
- * @return
- *   array with Twitter accounts
- */
-function twitter_twitter_accounts($account) {
-  module_load_include('inc', 'twitter');
-
-  $query = db_select('twitter_account', 'ta')
-    ->fields('ta', array('twitter_uid'));
-  if (user_access('use global twitter account', $account)) {
-    $or = db_or();
-    $or->condition('ta.uid', $account->uid);
-    $or->condition('ta.is_global', 1);
-    $query->condition($or);
-  }
-  else {
-    $query->condition('ta.uid', $account->uid);
-  }
-
-  $twitter_accounts = array();
-  foreach ($query->execute()->fetchCol() as $twitter_uid) {
-    $twitter_accounts[] = twitter_account_load($twitter_uid);
-  }
-  return $twitter_accounts;
-}
-
-/**
  * Implements hook_views_api().
  */
 function twitter_views_api() {
@@ -318,21 +246,13 @@ function twitter_views_api() {
 }
 
 /**
- * Implements hook_admin_paths_alter().
+ * Checks if the Twitter Application keys are set.
  *
- * OAuth callback disagrees with overlay.
+ * @return
+ *   boolean TRUE if both the Twitter Application key and secret are set.
  */
-function twitter_admin_paths_alter(&$paths) {
-  $paths['user/*/edit/twitter'] = FALSE;
-}
-
-/**
- * Implements hook_user_delete().
- *
- * Removes user's Twitter accounts and tweets
- */
-function twitter_user_delete($account) {
-  foreach ($account->twitter_accounts as $twitter_account) {
-    twitter_account_delete($twitter_account->id);
-  }
+function twitter_api_keys() {
+  $key = variable_get('twitter_consumer_key');
+  $secret = variable_get('twitter_consumer_secret');
+  return !(empty($key) && empty($secret));
 }

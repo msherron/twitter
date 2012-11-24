@@ -81,21 +81,39 @@ function twitter_admin_form($form, &$form_state) {
 /**
  * Calls the form builder that lists Twitter accounts.
  */
-function twitter_user_settings($account) {
-  module_load_include('inc', 'twitter');
-
-  $output = array();
-  if (!empty($account->twitter_accounts)) {
-    $output['list_form'] = drupal_get_form('twitter_account_list_form', $account->twitter_accounts);
+function twitter_user_settings() {
+  // Verify OAuth keys.
+  if (!twitter_api_keys()) {
+    $output = t('<p>Please fill out the OAuth fields at <a href="admin/config/services/twitter/settings">Twitter Settings</a> in order to add Twitter accounts.</p>');
   }
-  $output['form'] = drupal_get_form('twitter_account_form', $account);
+  else {
+    module_load_include('inc', 'twitter');
+    $twitter_accounts = twitter_account_load_all();
+
+    $output = array();
+    if (count($twitter_accounts)) {
+      // List Twitter accounts.
+      $output['header'] = array(
+        '#markup' => t('<p>Tweets are pulled from Twitter by ' .
+            '<a href="/admin/reports/status/run-cron?destination=admin/config/services/twitter">running cron</a>. ' .
+            'You can view the full list of tweets at the <a href="/all-tweets">All Tweets</a> view.</p>'),
+      );
+      $output['list_form'] = drupal_get_form('twitter_account_list_form', $twitter_accounts);
+    }
+    else {
+      // No accounts added. Inform about how to add one.
+      $output['header'] = array(
+        '#markup' => t('<p>No Twitter accounts have been added yet. Click on the following button to add one.</p>'),
+      );
+    }
+    $output['form'] = drupal_get_form('twitter_account_form');
+  }
 
   return $output;
 }
 
 /**
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
+ * Formats each Twitter account as a row within a form.
  */
 function twitter_account_list_form($form, $form_state, $twitter_accounts = array()) {
   $form['#tree'] = TRUE;
@@ -126,11 +144,6 @@ function _twitter_account_list_row($account) {
     '#value' => $account->id,
   );
 
-  $form['uid'] = array(
-    '#type' => 'value',
-    '#value' => $account->uid,
-  );
-
   $form['screen_name'] = array(
     '#type' => 'value',
     '#value' => $account->screen_name,
@@ -152,21 +165,15 @@ function _twitter_account_list_row($account) {
     '#markup' => empty($account->protected) ? t('No') : t('Yes'),
   );
 
-  // Here we use user_access('import own tweets') to check permission
-  // instead of user_access('import own tweets', $account->uid)
-  // because we allow roles with sufficient permission to overwrite
-  // the user's import settings.
-  if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
-    $form['import'] = array(
-      '#type' => 'checkbox',
-      '#default_value' => $account->import ? $account->import : '',
-    );
-    $form['mentions'] = array(
-      '#type' => 'checkbox',
-      '#default_value' => $account->mentions ? $account->mentions : '',
-    );
+  $form['import'] = array(
+    '#type' => 'checkbox',
+    '#default_value' => $account->import ? $account->import : '',
+  );
 
-  }
+  $form['mentions'] = array(
+    '#type' => 'checkbox',
+    '#default_value' => $account->mentions ? $account->mentions : '',
+  );
 
   $form['delete'] = array(
     '#type' => 'checkbox',
@@ -181,58 +188,29 @@ function _twitter_account_list_row($account) {
 function theme_twitter_account_list_form($variables) {
   $form = $variables['form'];
 
-  if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
-    $header = array(
-      '',
-      t('Name'),
-      t('Description'),
-      t('Private'),
-      t('Import'),
-      t('Mentions'),
-      t('Delete'),
-    );
-  }
-  else {
-    $header = array('', t('Name'), t('Description'), t('Private'), t('Delete'));
-  }
-
-  if (user_access('make twitter accounts global')) {
-    $header[] = '';
-  }
+  $header = array(
+    '',
+    t('Name'),
+    t('Description'),
+    t('Private'),
+    t('Tweets'),
+    t('Mentions'),
+    t('Delete'),
+  );
 
   $rows = array();
-
   foreach (element_children($form['accounts']) as $key) {
     $element = &$form['accounts'][$key];
-    if (variable_get('twitter_import', TRUE) && user_access('import own tweets')) {
-      $row = array(
-        drupal_render($element['image']),
-        drupal_render($element['id']) . drupal_render($element['screen_name']) .
-          drupal_render($element['visible_name']),
-        drupal_render($element['description']),
-        drupal_render($element['protected']),
-        drupal_render($element['import']),
-        drupal_render($element['mentions']),
-        drupal_render($element['delete']),
-      );
-    }
-    else {
-      $row = array(
-        drupal_render($element['image']),
-        drupal_render($element['id']) . drupal_render($element['screen_name']) .
-          drupal_render($element['visible_name']),
-        drupal_render($element['description']),
-        drupal_render($element['protected']),
-        drupal_render($element['delete']),
-      );
-    }
-
-    if (user_access('make twitter accounts global')) {
-      $label = ($element['#account']->is_global) ? t('remove global') : t('make global');
-      $row[] = l($label, 'user/' . $element['#account']->uid . '/edit/twitter/global/' .
-        $element['#account']->id);
-    }
-
+    $row = array(
+      drupal_render($element['image']),
+      drupal_render($element['id']) . drupal_render($element['screen_name']) .
+        drupal_render($element['visible_name']),
+      drupal_render($element['description']),
+      drupal_render($element['protected']),
+      drupal_render($element['import']),
+      drupal_render($element['mentions']),
+      drupal_render($element['delete']),
+    );
     $rows[] = $row;
   }
 
@@ -256,50 +234,6 @@ function twitter_account_list_form_submit($form, &$form_state) {
       drupal_set_message(t('The Twitter account was deleted.'));
     }
   }
-}
-
-/**
- * Form builder for setting a Twitter account as global.
- */
-function twitter_user_make_global($form, $form_state, $account, $twitter_uid) {
-  module_load_include('inc', 'twitter');
-
-  $twitter_account = twitter_account_load($twitter_uid);
-
-  $form = array();
-
-  $form['uid'] = array(
-    '#type' => 'value',
-    '#value' => $account->uid,
-  );
-
-  $form['twitter_uid'] = array(
-    '#type' => 'value',
-    '#value' => $twitter_uid,
-  );
-
-  if ($twitter_account->is_global) {
-    $text = t('Are you sure you want to remove %screen_name from the global accounts?', array('%screen_name' => $twitter_account->screen_name));
-    $description = t('This means other users will no longer be allowed to post using this account.');
-  }
-  else {
-    $text = t('Are you sure you want to allow other users to access the %screen_name account?', array('%screen_name' => $twitter_account->screen_name));
-    $description = t('This will allow other users to post using this account.');
-  }
-
-  return confirm_form($form, $text, 'user/' . $account->uid . '/edit/twitter', $description);
-}
-
-/**
- * Form submit handler for setting a Twitter account as global.
- */
-function twitter_user_make_global_submit($form, &$form_state) {
-  db_update('twitter_account')
-    ->expression('is_global', '(1 - is_global)')
-    ->condition('twitter_uid', $form_state['values']['twitter_uid'])
-    ->execute();
-
-  $form_state['redirect'] = 'user/' . $form_state['values']['uid'] . '/edit/twitter';
 }
 
 /**
@@ -368,7 +302,7 @@ function twitter_oauth_callback() {
     global $user;
     if ($user->uid) {
       // User is logged in, was attempting to OAuth a Twitter account.
-      drupal_goto('user/' . $user->uid . '/edit/twitter');
+      drupal_goto('admin/config/services/twitter');
     }
     else {
       // Anonymous user, redirect to front page.
@@ -439,7 +373,7 @@ function twitter_oauth_callback_form_validate($form, &$form_state) {
 
 /**
  * Handle a Twitter OAuth return request and store the account creds
- * in the DB. Redirects to user/%/edit/twitter
+ * in the DB.
  */
 function twitter_oauth_callback_form_submit($form, &$form_state) {
   $key = variable_get('twitter_consumer_key', '');
