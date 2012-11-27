@@ -11,7 +11,15 @@ require_once(libraries_get_path('twitter') . '/twitter.lib.php');
 /**
  * Connect to the Twitter API.
  */
-function twitter_connect($account) {
+function twitter_connect($account = NULL) {
+  if (!$account) {
+    // Load the first authenticated account.
+    $twitter_uid = db_query("SELECT twitter_uid
+                             FROM {twitter_account}
+                             WHERE oauth_token <> ''
+                               AND oauth_token_secret <> '' ")->fetchField();
+    $account = twitter_account_load($twitter_uid);
+  }
   $auth = $account->get_auth();
   if (isset($auth['oauth_token']) && isset($auth['oauth_token_secret'])) {
     return new Twitter(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''),
@@ -25,10 +33,9 @@ function twitter_connect($account) {
 /**
  * Saves a TwitterUser object to {twitter_account}
  */
-function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL) {
+function twitter_account_save($twitter_user, $save_auth = FALSE) {
   $values = (array) $twitter_user;
   $values['twitter_uid'] = $values['id'];
-  // bool => int for DB storage
   foreach (array('protected', 'verified', 'profile_background_tile') as $k) {
     if (isset($values[$k])) {
       $values[$k] = (int) $values[$k];
@@ -37,11 +44,6 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
 
   if ($save_auth) {
     $values += $twitter_user->get_auth();
-    if (empty($account)) {
-      global $user;
-      $account = $user;
-    }
-    $values['uid'] = $account->uid;
   }
   $schema = drupal_get_schema('twitter_account');
   foreach ($values as $k => $v) {
@@ -49,18 +51,13 @@ function twitter_account_save($twitter_user, $save_auth = FALSE, $account = NULL
       unset($values[$k]);
     }
   }
-  if (!isset($values['uid'])) {
-    $values['uid'] = 0;
-  }
   db_merge('twitter_account')
     ->key(array('twitter_uid' => $values['twitter_uid']))
     ->fields($values)
     ->execute();
 
   // Notify other modules of the twitter account save
-  if (!empty($account)) {
-    module_invoke_all('twitter_account_save', $account, $values);
-  }
+  module_invoke_all('twitter_account_save', $values);
 }
 
 /**
@@ -78,7 +75,6 @@ function twitter_account_load($id) {
     $values['id'] = $values['twitter_uid'];
     $account = new TwitterUser($values);
     $account->set_auth($values);
-    $account->uid = $values['uid'];
     $account->import = $values['import'];
     $account->mentions = $values['mentions'];
     $account->is_global = $values['is_global'];
@@ -95,10 +91,9 @@ function twitter_account_load($id) {
  */
 function twitter_account_load_all() {
   $accounts = array();
-  $result = db_query("SELECT twitter_uid
+  $result = db_query('SELECT twitter_uid
                       FROM {twitter_account}
-                      WHERE oauth_token <> ''
-                      AND oauth_token_secret <> ''");
+                      ORDER BY screen_name');
   foreach ($result as $account) {
     $accounts[] = twitter_account_load($account->twitter_uid);
   }
@@ -151,6 +146,10 @@ function twitter_fetch_user_timeline($id) {
 
   $since = db_query("SELECT MAX(twitter_id) FROM {twitter} WHERE screen_name = :screen_name", array(':screen_name' => $account->screen_name))->fetchField();
 
+  // Connect to Twitter using an authenticated account.
+  if (!$account->is_auth()) {
+    $account = NULL;
+  }
   $twitter = twitter_connect($account);
 
   $params = array();
@@ -158,7 +157,7 @@ function twitter_fetch_user_timeline($id) {
     $params['since_id'] = $since;
   }
 
-  $statuses = $twitter->user_timeline($account->id, $params);
+  $statuses = $twitter->user_timeline($id, $params);
   foreach ($statuses as $status) {
     twitter_status_save($status);
   }
@@ -169,14 +168,13 @@ function twitter_fetch_user_timeline($id) {
 }
 
 /**
- * Fetches user's mentions.
+ * Fetches user's mentions of an authenticated account.
  */
 function twitter_fetch_mentions_timeline($id) {
   $account = twitter_account_load($id);
   $twitter = twitter_connect($account);
 
   $params = array();
-
   $statuses = $twitter->mentions_timeline($params);
   foreach ($statuses as $status) {
     if (!twitter_account_load($status->user->id)) {

@@ -14,7 +14,7 @@ define ('TWITTER_TINYURL',      'http://tinyurl.com');
  */
 function twitter_menu() {
   $items['twitter/oauth'] = array(
-    'title' => 'Twitter',
+    'title' => 'Twitter OAuth',
     'access callback' => TRUE,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('twitter_oauth_callback'),
@@ -23,7 +23,7 @@ function twitter_menu() {
   );
 
   $items['admin/config/services/twitter'] = array(
-    'title' => 'Twitter accounts',
+    'title' => 'Twitter',
     'page callback' => 'twitter_user_settings',
     'access arguments' => array('add twitter accounts'),
     'file' => 'twitter.pages.inc',
@@ -112,17 +112,15 @@ function twitter_cron() {
   module_load_include('inc', 'twitter');
   $result = db_query_range("SELECT twitter_uid
                             FROM {twitter_account}
-                            WHERE import = :import
-                            AND oauth_token <> ''
-                            AND oauth_token_secret <> ''
+                            WHERE import = 1
                             ORDER BY last_refresh ASC",
-                            0, 20, array(':import' => 1));
+                            0, 20);
   try {
     foreach ($result as $account) {
       // Fetch tweets and mentions.
       twitter_fetch_user_timeline($account->twitter_uid);
       $twitter_account = twitter_account_load($account->twitter_uid);
-      if ($twitter_account->mentions) {
+      if ($twitter_account->is_auth() && $twitter_account->mentions) {
         twitter_fetch_mentions_timeline($twitter_account->id);
       }
       // Mark the time this account was updated.

@@ -145,13 +145,6 @@ function twitter_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'uid' => array(
-        'description' => "The {users}.uid of the owner of this account",
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'size' => 'big',
-        'not null' => TRUE,
-      ),
       'host' => array(
         'description' => 'The host for this account can be a laconi.ca instance',
         'type' => 'varchar',
@@ -306,7 +299,7 @@ function twitter_schema() {
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'default' => 1,
+        'default' => 0,
       ),
       'mentions' => array(
         'description' => "Boolean flag indicating whether the {twitter_user}'s mentions should be pulled in by the site.",
@@ -400,4 +393,26 @@ function twitter_update_7400() {
     'default' => 0,
   );
   db_add_field('twitter_account', 'mentions', $data);
+}
+
+/**
+ * Drops field uid at twitter_account.
+ */
+function twitter_update_7401() {
+  db_drop_field('twitter_account', 'uid');
+}
+
+/**
+ * Makes the import field not enabled by default at twitter_account table.
+ */
+function twitter_update_7402() {
+  $spec = array(
+    'description' => "Boolean flag indicating whether the {twitter_user}'s posts should be pulled in by the site.",
+    'type' => 'int',
+    'unsigned' => TRUE,
+    'not null' => TRUE,
+    'default' => 0,
+  );
+
+  db_change_field('twitter_account', 'import', 'import', $spec);
 }
