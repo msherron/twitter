@@ -112,7 +112,7 @@ function twitter_cron() {
   module_load_include('inc', 'twitter');
   $result = db_query_range("SELECT twitter_uid
                             FROM {twitter_account}
-                            WHERE import = 1
+                            WHERE added_by_uid <> 0 AND import = 1
                             ORDER BY last_refresh ASC",
                             0, 20);
   try {

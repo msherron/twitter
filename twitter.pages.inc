@@ -259,11 +259,6 @@ function twitter_auth_account_form($form, $form_state, $account = NULL) {
     $account = $user;
   }
 
-  $form['uid'] = array(
-    '#type' => 'value',
-    '#value' => $account->uid,
-  );
-
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Add an authenticated account'),
@@ -296,7 +291,6 @@ function twitter_auth_account_form_submit($form, &$form_state) {
   $twitter = new Twitter($key, $secret);
   $token = $twitter->get_request_token();
   if ($token) {
-    $_SESSION['twitter_oauth']['account'] = user_load($form['uid']['#value']);
     $_SESSION['twitter_oauth']['token'] = $token;
     $_SESSION['twitter_oauth']['destination'] = $_GET['q'];
     drupal_goto($twitter->get_authorize_url($token));
@@ -401,9 +395,11 @@ function twitter_oauth_callback_form_submit($form, &$form_state) {
     form_set_error('screen_name', t('Request failed: @message.', array('@message' => $e->getMessage())));
     return;
   }
+  // Save the new Twitter account and set the user's uid who added it.
   $twitter_account->set_auth($response);
-  $account = $form_state['twitter_oauth']['account'];
-  twitter_account_save($twitter_account, TRUE, $account);
+  global $user;
+  $twitter_account->added_by_uid = $user->uid;
+  twitter_account_save($twitter_account, TRUE);
 
   $form_state['programmed'] = FALSE;
   $form_state['redirect'] = $form_state['twitter_oauth']['destination'];
@@ -431,20 +427,17 @@ function twitter_non_auth_account_form($form, $form_state) {
  * Submit form handler to add a non-authenticated Twitter account.
  */
 function twitter_non_auth_account_form_submit($form, &$form_state) {
-  module_load_include('inc', 'twitter');
-  $key = variable_get('twitter_consumer_key', '');
-  $secret = variable_get('twitter_consumer_secret', '');
-
   $name = $form_state['values']['screen_name'];
   $twitter = twitter_connect();
-  $account = $twitter->users_show($name, FALSE);
-  dd($account);
-  if ($account === FALSE) {
-    form_set_error('screen_name', t('Could not add account. Check the recent mesasges report.'));
-    return;
+  $twitter_account = $twitter->users_show($name, FALSE);
+  if (!isset($twitter_account->id)) {
+    form_set_error('screen_name', t('Could not add the Twitter account <em>@name</em>. Check the recent messages report.',
+      array('@name' => $name)));
   }
   else {
+    global $user;
+    $twitter_account->added_by_uid = $user->uid;
+    twitter_account_save($twitter_account, FALSE);
     drupal_set_message(t('Twitter account added successfully'));
-    twitter_account_save($account, FALSE);
   }
 }

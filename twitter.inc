@@ -83,16 +83,16 @@ function twitter_account_load($id) {
 }
 
 /**
- * Loads all Twitter accounts.
+ * Loads all Twitter accounts added by a Drupal user.
  *
  * @return
  *   array of TwitterUser objects.
- *
  */
 function twitter_account_load_all() {
   $accounts = array();
   $result = db_query('SELECT twitter_uid
                       FROM {twitter_account}
+                      WHERE added_by_uid <> 0
                       ORDER BY screen_name');
   foreach ($result as $account) {
     $accounts[] = twitter_account_load($account->twitter_uid);
@@ -139,30 +139,27 @@ function twitter_set_status($twitter_account, $status) {
 }
 
 /**
- * Fetches a user's timeline
+ * Fetches a user's timeline.
  */
 function twitter_fetch_user_timeline($id) {
   $account = twitter_account_load($id);
-
   $since = db_query("SELECT MAX(twitter_id) FROM {twitter} WHERE screen_name = :screen_name", array(':screen_name' => $account->screen_name))->fetchField();
 
-  // Connect to Twitter using an authenticated account.
-  if (!$account->is_auth()) {
-    $account = NULL;
-  }
-  $twitter = twitter_connect($account);
-
+  // Connect to the Twitter's API.
+  $twitter = twitter_connect();
   $params = array();
   if ($since) {
     $params['since_id'] = $since;
   }
 
+  // Fetch tweets.
   $statuses = $twitter->user_timeline($id, $params);
   foreach ($statuses as $status) {
     twitter_status_save($status);
   }
 
   if (count($statuses) > 0) {
+    // Update account details.
     twitter_account_save($statuses[0]->user);
   }
 }
@@ -172,6 +169,7 @@ function twitter_fetch_user_timeline($id) {
  */
 function twitter_fetch_mentions_timeline($id) {
   $account = twitter_account_load($id);
+  // Connect to Twitter's API using the authenticated account to fetch mentions.
   $twitter = twitter_connect($account);
 
   $params = array();
