@@ -10,6 +10,12 @@ require_once(libraries_get_path('twitter') . '/twitter.lib.php');
 
 /**
  * Connect to the Twitter API.
+ *
+ * @param object $account
+ *   An authenticated twitter_account object to be used to authenticate against
+ *   Twitter.
+ * @return
+ *   a Twitter object ready to be used to query the Twitter API or FALSE.
  */
 function twitter_connect($account = NULL) {
   if (!$account) {
@@ -20,14 +26,14 @@ function twitter_connect($account = NULL) {
                                AND oauth_token_secret <> '' ")->fetchField();
     $account = twitter_account_load($twitter_uid);
   }
-  $auth = $account->get_auth();
-  if (isset($auth['oauth_token']) && isset($auth['oauth_token_secret'])) {
-    return new Twitter(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''),
-                            $auth['oauth_token'], $auth['oauth_token_secret']);
+  if ($account) {
+    $auth = $account->get_auth();
+    if (isset($auth['oauth_token']) && isset($auth['oauth_token_secret'])) {
+      return new Twitter(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''),
+                              $auth['oauth_token'], $auth['oauth_token_secret']);
+    }
   }
-  else {
-    return FALSE;
-  }
+  return FALSE;
 }
 
 /**
