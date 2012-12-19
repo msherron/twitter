@@ -24,8 +24,9 @@ function twitter_menu() {
 
   $items['admin/config/services/twitter'] = array(
     'title' => 'Twitter',
+    'description' => 'Twitter accounts and settings.',
     'page callback' => 'twitter_user_settings',
-    'access arguments' => array('add twitter accounts'),
+    'access callback' => 'twitter_account_access',
     'file' => 'twitter.pages.inc',
   );
 
@@ -36,7 +37,7 @@ function twitter_menu() {
 
   $items['admin/config/services/twitter/settings'] = array(
     'title' => 'Settings',
-    'description' => 'Configure integration with Twitter (and compatible) API services.',
+    'description' => 'Twitter settings.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('twitter_admin_form'),
     'access arguments' => array('administer site configuration'),
@@ -55,16 +56,20 @@ function twitter_permission() {
     'add twitter accounts' => array(
       'title' => t('Add Twitter accounts'),
     ),
-    'use global twitter account' => array(
-      'title' => t('Use the site global Twitter account'),
-    ),
-    'make twitter accounts global' => array(
-      'title' => t('Assign a Twitter account as the site global account.'),
-    ),
-    'import own tweets' => array(
-      'title' => t('Import own tweets to the site.'),
+    'add authenticated twitter accounts' => array(
+      'title' => t('Add authenticated Twitter accounts'),
     ),
   );
+}
+
+/**
+ * Access callback for the Twitter accounts page.
+ *
+ * @return
+ *   Boolean TRUE if the current user has access.
+ */
+function twitter_account_access() {
+  return user_access('add twitter accounts') || user_access('add authenticated twitter accounts');
 }
 
 /**

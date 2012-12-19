@@ -5,7 +5,7 @@
  */
 
 /**
- * Form builder; Twitter settings form.
+ * Twitter settings form.
  */
 function twitter_admin_form($form, &$form_state) {
   $form['twitter_import'] = array(
@@ -79,9 +79,11 @@ function twitter_admin_form($form, &$form_state) {
 }
 
 /**
- * Calls the form builder that lists Twitter accounts.
+ * Form builder that lists Twitter accounts.
  */
 function twitter_user_settings() {
+  global $user;
+
   // Verify OAuth keys.
   if (!twitter_api_keys()) {
     $output = t('<p>You need to authenticate at least one Twitter account in order to use the Twitter API. Please fill out the OAuth fields at <a href="/admin/config/services/twitter/settings">Twitter Settings</a> and then return here.</p>');
@@ -96,7 +98,7 @@ function twitter_user_settings() {
       $output['header'] = array(
         '#markup' => t('<p>Tweets are pulled from Twitter by ' .
             '<a href="/admin/reports/status/run-cron?destination=admin/config/services/twitter">running cron</a>. ' .
-            'You can view the full list of tweets at the <a href="/all-tweets">All Tweets</a> view.</p>'),
+            'You can view the full list of tweets at the <a href="/tweets">Tweets</a> view.</p>'),
       );
       $output['list_form'] = drupal_get_form('twitter_account_list_form', $twitter_accounts);
     }
@@ -114,7 +116,10 @@ function twitter_user_settings() {
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
     );
-    $output['add_account']['form'] = drupal_get_form('twitter_auth_account_form');
+
+    if (user_access('add authenticated twitter accounts')) {
+      $output['add_account']['form'] = drupal_get_form('twitter_auth_account_form');
+    }
     if (twitter_connect()) {
       $output['add_account']['non_auth'] = drupal_get_form('twitter_non_auth_account_form');
     }
@@ -184,6 +189,9 @@ function _twitter_account_list_row($account) {
     '#type' => 'checkbox',
     '#default_value' => $account->import ? $account->import : '',
   );
+  if ($account->import == TRUE) {
+    $form['import']['#suffix'] = l('View', 'tweets/' . $account->screen_name, array('attributes' => array('target' => '_blank')));
+  }
 
   if ($account->is_auth()) {
     $form['mentions'] = array(

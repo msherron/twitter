@@ -9,109 +9,32 @@ function twitter_views_default_views() {
   $view->description = 'Displays Twitter.com status messages for users who have associated Twitter accounts.';
   $view->tag = '';
   $view->base_table = 'twitter';
-  $view->human_name = '';
+  $view->human_name = 'Tweets';
   $view->core = 0;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Tweets */
-  $handler = $view->new_display('default', 'Tweets', 'default');
-  $handler->display->display_options['use_more_always'] = FALSE;
-  $handler->display->display_options['access']['type'] = 'none';
-  $handler->display->display_options['cache']['type'] = 'none';
-  $handler->display->display_options['query']['type'] = 'views_query';
-  $handler->display->display_options['query']['options']['query_comment'] = FALSE;
-  $handler->display->display_options['exposed_form']['type'] = 'basic';
-  $handler->display->display_options['pager']['type'] = 'none';
-  $handler->display->display_options['style_plugin'] = 'table';
-  $handler->display->display_options['style_options']['grouping'] = '';
-  $handler->display->display_options['style_options']['columns'] = array(
-    'profile_image_url' => 'profile_image_url',
-    'text' => 'text',
-    'created_time' => 'text',
-  );
-  $handler->display->display_options['style_options']['default'] = '-1';
-  $handler->display->display_options['style_options']['info'] = array(
-    'profile_image_url' => array(
-      'sortable' => 0,
-      'separator' => '',
-    ),
-    'text' => array(
-      'sortable' => 0,
-      'separator' => ' &#8212; ',
-    ),
-    'created_time' => array(
-      'sortable' => 0,
-      'separator' => '',
-    ),
-  );
-  /* Field: Twitter: Profile image */
-  $handler->display->display_options['fields']['profile_image_url']['id'] = 'profile_image_url';
-  $handler->display->display_options['fields']['profile_image_url']['table'] = 'twitter_account';
-  $handler->display->display_options['fields']['profile_image_url']['field'] = 'profile_image_url';
-  $handler->display->display_options['fields']['profile_image_url']['label'] = '';
-  /* Field: Twitter: Message text */
-  $handler->display->display_options['fields']['text']['id'] = 'text';
-  $handler->display->display_options['fields']['text']['table'] = 'twitter';
-  $handler->display->display_options['fields']['text']['field'] = 'text';
-  $handler->display->display_options['fields']['text']['label'] = '';
-  $handler->display->display_options['fields']['text']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['text']['link_urls'] = 1;
-  $handler->display->display_options['fields']['text']['link_usernames'] = 1;
-  $handler->display->display_options['fields']['text']['link_hashtags'] = 1;
-  $handler->display->display_options['fields']['text']['link_attributes'] = 1;
-  /* Field: Twitter: Created time */
-  $handler->display->display_options['fields']['created_time']['id'] = 'created_time';
-  $handler->display->display_options['fields']['created_time']['table'] = 'twitter';
-  $handler->display->display_options['fields']['created_time']['field'] = 'created_time';
-  $handler->display->display_options['fields']['created_time']['label'] = '';
-  $handler->display->display_options['fields']['created_time']['date_format'] = 'time ago';
-  /* Sort criterion: Twitter: Created time */
-  $handler->display->display_options['sorts']['created_time']['id'] = 'created_time';
-  $handler->display->display_options['sorts']['created_time']['table'] = 'twitter';
-  $handler->display->display_options['sorts']['created_time']['field'] = 'created_time';
-  $handler->display->display_options['sorts']['created_time']['order'] = 'DESC';
-  /* Contextual filter: User: Uid */
-  $handler->display->display_options['arguments']['uid']['id'] = 'uid';
-  $handler->display->display_options['arguments']['uid']['table'] = 'users';
-  $handler->display->display_options['arguments']['uid']['field'] = 'uid';
-  $handler->display->display_options['arguments']['uid']['default_action'] = 'default';
-  $handler->display->display_options['arguments']['uid']['exception']['title_enable'] = TRUE;
-  $handler->display->display_options['arguments']['uid']['exception']['title'] = 'All author';
-  $handler->display->display_options['arguments']['uid']['title_enable'] = TRUE;
-  $handler->display->display_options['arguments']['uid']['title'] = '%1\'s tweets';
-  $handler->display->display_options['arguments']['uid']['default_argument_type'] = 'user';
-  $handler->display->display_options['arguments']['uid']['default_argument_options']['user'] = TRUE;
-  $handler->display->display_options['arguments']['uid']['summary']['format'] = 'default_summary';
-  $handler->display->display_options['arguments']['uid']['specify_validation'] = TRUE;
-  $handler->display->display_options['arguments']['uid']['validate']['type'] = 'php';
-  $handler->display->display_options['arguments']['uid']['validate_options']['code'] = '$uid = arg(1);
-                           if (!empty($uid)) {
-                             $account = user_load($uid);
-                             $twitter_accounts = twitter_twitter_accounts($account);
-                             if(count($twitter_accounts)) {
-                               return TRUE;
-                             }
-                             else {
-                               return FALSE;
-                             }
-                           }';
-  /* Filter criterion: Twitter: Protected status */
-  $handler->display->display_options['filters']['protected']['id'] = 'protected';
-  $handler->display->display_options['filters']['protected']['table'] = 'twitter_account';
-  $handler->display->display_options['filters']['protected']['field'] = 'protected';
-  $handler->display->display_options['filters']['protected']['value'] = 0;
-  $handler->display->display_options['filters']['protected']['group'] = '0';
-  $handler->display->display_options['filters']['protected']['expose']['operator'] = FALSE;
-
-  /* Display: User tweets */
-  $handler = $view->new_display('page', 'User tweets', 'page');
-  $handler->display->display_options['display_description'] = 'Lists tweets made by a particular user.';
+  $handler = $view->new_display('page', 'Tweets', 'page_all_tweets');
+  $handler->display->display_options['display_description'] = 'Lists unprotected tweets.';
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
-  $handler->display->display_options['path'] = 'user/%/tweets';
-  $handler->display->display_options['menu']['type'] = 'tab';
-  $handler->display->display_options['menu']['title'] = 'Twitter';
-  $handler->display->display_options['menu']['weight'] = '1';
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '20';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
+  $handler->display->display_options['defaults']['arguments'] = FALSE;
+  /* Contextual filter: Twitter: Login name */
+  $handler->display->display_options['arguments']['screen_name']['id'] = 'screen_name';
+  $handler->display->display_options['arguments']['screen_name']['table'] = 'twitter';
+  $handler->display->display_options['arguments']['screen_name']['field'] = 'screen_name';
+  $handler->display->display_options['arguments']['screen_name']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['screen_name']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['screen_name']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['screen_name']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['screen_name']['limit'] = '0';
+  $handler->display->display_options['path'] = 'tweets';
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block');
@@ -148,20 +71,7 @@ function twitter_views_default_views() {
   $handler->display->display_options['fields']['created_time']['label'] = '';
   $handler->display->display_options['fields']['created_time']['date_format'] = 'time ago';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
-  $handler->display->display_options['block_description'] = 'User Tweets';
-
-  /* Display: All tweets */
-  $handler = $view->new_display('page', 'All tweets', 'page_all_tweets');
-  $handler->display->display_options['display_description'] = 'Lists all unprotected tweets.';
-  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
-  $handler->display->display_options['defaults']['pager'] = FALSE;
-  $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '20';
-  $handler->display->display_options['pager']['options']['offset'] = '0';
-  $handler->display->display_options['pager']['options']['id'] = '0';
-  $handler->display->display_options['pager']['options']['quantity'] = '9';
-  $handler->display->display_options['defaults']['arguments'] = FALSE;
-  $handler->display->display_options['path'] = 'all-tweets';
+  $handler->display->display_options['block_description'] = 'Tweets';
 
   return array('tweets' => $view);
 }
