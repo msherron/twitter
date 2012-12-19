@@ -82,8 +82,6 @@ function twitter_admin_form($form, &$form_state) {
  * Form builder that lists Twitter accounts.
  */
 function twitter_user_settings() {
-  global $user;
-
   // Verify OAuth keys.
   if (!twitter_api_keys()) {
     $output = t('<p>You need to authenticate at least one Twitter account in order to use the Twitter API. Please fill out the OAuth fields at <a href="/admin/config/services/twitter/settings">Twitter Settings</a> and then return here.</p>');
