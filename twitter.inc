@@ -110,7 +110,7 @@ function twitter_account_load_all() {
  * Saves a TwitterStatus object to {twitter}
  */
 function twitter_status_save($status) {
-  $status = array(
+  $row = array(
     'twitter_id' => $status->id,
     'screen_name' => $status->user->screen_name,
     'created_time' => strtotime($status->created_at),
@@ -122,10 +122,10 @@ function twitter_status_save($status) {
     'truncated' => (int) $status->truncated,
   );
   db_merge('twitter')
-    ->key(array('twitter_id' => $status['twitter_id']))
-    ->fields($status)
+    ->key(array('twitter_id' => $row['twitter_id']))
+    ->fields($row)
     ->execute();
-  // Let other modules know that an status has been just saved.
+  // Let other modules know that a status has been saved.
   module_invoke_all('twitter_status_save', $status);
 }
 
