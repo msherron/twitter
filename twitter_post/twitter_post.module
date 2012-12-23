@@ -1,8 +1,7 @@
 <?php
-
 /**
  * @file
- * Main hooks for twitter post module
+ * Hook implementations for twitter_post module.
  */
 
 /**
@@ -129,7 +128,8 @@ function twitter_post_form($account = NULL) {
   }
 
   $options = array();
-  foreach ($account->twitter_accounts as $twitter_account) {
+  $twitter_accounts = twitter_load_authenticated_accounts();
+  foreach ($twitter_accounts as $twitter_account) {
     $options[$twitter_account->id] = $twitter_account->screen_name;
   }
 

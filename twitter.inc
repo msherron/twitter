@@ -89,7 +89,7 @@ function twitter_account_load($id) {
 }
 
 /**
- * Loads all Twitter accounts added by a Drupal user.
+ * Loads all Twitter accounts added by a user.
  *
  * @return
  *   array of TwitterUser objects.
@@ -104,6 +104,23 @@ function twitter_account_load_all() {
     $accounts[] = twitter_account_load($account->twitter_uid);
   }
   return $accounts;
+}
+
+/**
+ * Returns a list of authenticated Twitter accounts.
+ *
+ * @return
+ *   array of TwitterUser objects.
+ */
+function twitter_load_authenticated_accounts() {
+  $accounts = twitter_account_load_all();
+  $auth_accounts = array();
+  foreach ($accounts as $index => $account) {
+    if ($account->is_auth()) {
+      $auth_accounts[] = $account;
+    }
+  }
+  return $auth_accounts;
 }
 
 /**
