@@ -42,12 +42,7 @@ function twitter_actions_action_info() {
  *   Form definition.
  */
 function twitter_actions_set_status_action_form($context) {
-  module_load_include('inc', 'twitter');
-  $twitter_accounts = twitter_load_authenticated_accounts();
-  $options = array();
-  foreach ($twitter_accounts as $twitter_account) {
-    $options[$twitter_account->screen_name] = $twitter_account->screen_name;
-  }
+  $options = twitter_actions_account_options();
   // Set default values for form.
   $form['screen_name'] = array(
     '#type' => 'select',
@@ -76,6 +71,22 @@ function twitter_actions_set_status_action_form($context) {
   );
 
   return $form;
+}
+
+/**
+ * Returns a list of authenticated Twitter accounts to be used as options.
+ *
+ * @return
+ *   array of screen_name => screen_name entries.
+ */
+function twitter_actions_account_options() {
+  module_load_include('inc', 'twitter');
+  $twitter_accounts = twitter_load_authenticated_accounts();
+  $options = array();
+  foreach ($twitter_accounts as $twitter_account) {
+    $options[$twitter_account->screen_name] = $twitter_account->screen_name;
+  }
+  return $options;
 }
 
 /**
