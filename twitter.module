@@ -249,6 +249,46 @@ function twitter_views_api() {
 }
 
 /**
+ * Implements hook_user_load().
+ */
+function twitter_user_load($accounts) {
+  foreach ($accounts as $uid => $account) {
+    $accounts[$uid]->twitter_accounts = module_invoke_all('twitter_accounts', $account);
+  }
+}
+
+/**
+ * Implements hook_twitter_accounts().
+ *
+ * @return
+ *   array with Twitter accounts
+ */
+function twitter_twitter_accounts($account) {
+  module_load_include('inc', 'twitter');
+
+  $query = db_select('twitter_account', 'ta')
+    ->fields('ta', array('twitter_uid'))
+    ->condition('ta.added_by_uid', $account->uid);
+
+  $twitter_accounts = array();
+  foreach ($query->execute()->fetchCol() as $twitter_uid) {
+    $twitter_accounts[] = twitter_account_load($twitter_uid);
+  }
+  return $twitter_accounts;
+}
+
+/**
+ * Implements hook_user_delete().
+ *
+ * Removes user's Twitter accounts and tweets
+ */
+function twitter_user_delete($account) {
+  foreach ($account->twitter_accounts as $twitter_account) {
+    twitter_account_delete($twitter_account->id);
+  }
+}
+
+/**
  * Checks if the Twitter Application keys are set.
  *
  * @return
