@@ -73,7 +73,7 @@ function twitter_account_save($twitter_user, $save_auth = FALSE) {
  *   Twitter UID
  *
  * @return
- *   TwitterUser object
+ *   TwitterUser object or NULL.
  *
  */
 function twitter_account_load($id) {
@@ -86,6 +86,7 @@ function twitter_account_load($id) {
     $account->is_global = $values['is_global'];
     return $account;
   }
+  return NULL;
 }
 
 /**
