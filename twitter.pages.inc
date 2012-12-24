@@ -257,13 +257,15 @@ function twitter_account_list_form_submit($form, &$form_state) {
   foreach ($accounts as $account) {
     if (empty($account['delete'])) {
       twitter_account_save($account);
-      drupal_set_message(t('The Twitter account settings were updated.'));
     }
     else {
+      $twitter_account = twitter_account_load($account['id']);
       twitter_account_delete($account['id']);
-      drupal_set_message(t('The Twitter account was deleted.'));
+      drupal_set_message(t('The Twitter account <em>!account</em> was deleted.',
+        array('!account' => $twitter_account->screen_name)));
     }
   }
+  drupal_set_message(t('The Twitter account settings were updated.'));
 }
 
 /**
