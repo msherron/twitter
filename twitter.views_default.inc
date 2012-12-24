@@ -15,6 +15,88 @@ function twitter_views_default_views() {
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Tweets */
+  $handler = $view->new_display('default', 'Tweets', 'default');
+  $handler->display->display_options['access']['type'] = 'none';
+  $handler->display->display_options['cache']['type'] = 'none';
+  $handler->display->display_options['query']['type'] = 'views_query';
+  $handler->display->display_options['query']['options']['query_comment'] = FALSE;
+  $handler->display->display_options['exposed_form']['type'] = 'basic';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['style_plugin'] = 'table';
+  $handler->display->display_options['style_options']['grouping'] = '';
+  $handler->display->display_options['style_options']['columns'] = array(
+    'profile_image_url' => 'profile_image_url',
+    'text' => 'text',
+    'created_time' => 'text',
+  );
+  $handler->display->display_options['style_options']['default'] = '-1';
+  $handler->display->display_options['style_options']['info'] = array(
+    'profile_image_url' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+    'text' => array(
+      'sortable' => 0,
+      'separator' => ' &#8212; ',
+    ),
+    'created_time' => array(
+      'sortable' => 0,
+      'separator' => '',
+    ),
+  );
+  $handler->display->display_options['style_options']['override'] = 1;
+  $handler->display->display_options['style_options']['sticky'] = 0;
+  /* Field: Twitter: Profile image */
+  $handler->display->display_options['fields']['profile_image_url']['id'] = 'profile_image_url';
+  $handler->display->display_options['fields']['profile_image_url']['table'] = 'twitter_account';
+  $handler->display->display_options['fields']['profile_image_url']['field'] = 'profile_image_url';
+  $handler->display->display_options['fields']['profile_image_url']['label'] = '';
+  /* Field: Twitter: Message text */
+  $handler->display->display_options['fields']['text']['id'] = 'text';
+  $handler->display->display_options['fields']['text']['table'] = 'twitter';
+  $handler->display->display_options['fields']['text']['field'] = 'text';
+  $handler->display->display_options['fields']['text']['label'] = '';
+  $handler->display->display_options['fields']['text']['alter']['alter_text'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['make_link'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['absolute'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['external'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['replace_spaces'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['trim_whitespace'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['nl2br'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['word_boundary'] = 1;
+  $handler->display->display_options['fields']['text']['alter']['ellipsis'] = 1;
+  $handler->display->display_options['fields']['text']['alter']['more_link'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['strip_tags'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['trim'] = 0;
+  $handler->display->display_options['fields']['text']['alter']['html'] = 0;
+  $handler->display->display_options['fields']['text']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['text']['element_default_classes'] = 1;
+  $handler->display->display_options['fields']['text']['hide_empty'] = 0;
+  $handler->display->display_options['fields']['text']['empty_zero'] = 0;
+  $handler->display->display_options['fields']['text']['hide_alter_empty'] = 1;
+  $handler->display->display_options['fields']['text']['link_urls'] = 1;
+  $handler->display->display_options['fields']['text']['link_usernames'] = 1;
+  $handler->display->display_options['fields']['text']['link_hashtags'] = 1;
+  /* Field: Twitter: Created time */
+  $handler->display->display_options['fields']['created_time']['id'] = 'created_time';
+  $handler->display->display_options['fields']['created_time']['table'] = 'twitter';
+  $handler->display->display_options['fields']['created_time']['field'] = 'created_time';
+  $handler->display->display_options['fields']['created_time']['label'] = '';
+  $handler->display->display_options['fields']['created_time']['date_format'] = 'time ago';
+  /* Sort criterion: Twitter: Created time */
+  $handler->display->display_options['sorts']['created_time']['id'] = 'created_time';
+  $handler->display->display_options['sorts']['created_time']['table'] = 'twitter';
+  $handler->display->display_options['sorts']['created_time']['field'] = 'created_time';
+  $handler->display->display_options['sorts']['created_time']['order'] = 'DESC';
+  /* Filter criterion: Twitter: Protected status */
+  $handler->display->display_options['filters']['protected']['id'] = 'protected';
+  $handler->display->display_options['filters']['protected']['table'] = 'twitter_account';
+  $handler->display->display_options['filters']['protected']['field'] = 'protected';
+  $handler->display->display_options['filters']['protected']['value'] = 0;
+  $handler->display->display_options['filters']['protected']['group'] = '0';
+  $handler->display->display_options['filters']['protected']['expose']['operator'] = FALSE;
+
+  /* Display: Page */
   $handler = $view->new_display('page', 'Tweets', 'page_all_tweets');
   $handler->display->display_options['display_description'] = 'Lists unprotected tweets.';
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
