@@ -271,12 +271,7 @@ function twitter_account_list_form_submit($form, &$form_state) {
 /**
  * Form to add an authenticated Twitter account.
  */
-function twitter_auth_account_form($form, $form_state, $account = NULL) {
-  if (empty($account)) {
-    global $user;
-    $account = $user;
-  }
-
+function twitter_auth_account_form($form, $form_state) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Go to Twitter to add an authenticated account'),
