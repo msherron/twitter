@@ -309,7 +309,14 @@ function twitter_auth_account_form_submit($form, &$form_state) {
   if ($token) {
     $_SESSION['twitter_oauth']['token'] = $token;
     $_SESSION['twitter_oauth']['destination'] = $_GET['q'];
-    drupal_goto($twitter->get_authorize_url($token));
+    // Check for the overlay.
+    if (module_exists('overlay') && overlay_get_mode() == 'child') {
+      overlay_close_dialog($twitter->get_authorize_url($token), array('external' => TRUE));
+      overlay_deliver_empty_page();
+    }
+    else {
+      drupal_goto($twitter->get_authorize_url($token));
+    }
   }
   else {
     drupal_set_message(t('Could not obtain a valid token from the Twitter API. Please review the configuration.'),
