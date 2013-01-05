@@ -5,19 +5,10 @@
  */
 
 /**
- * @defgroup views_twitter_module twitter.module handlers
- *
- * Includes the ability to create views of just the twitter table.
- * @{
- */
-
-
-/**
  * Implements hook_views_data().
  */
 function twitter_views_data() {
   // Basic table information.
-
   $data['twitter']['table']['group']  = t('Twitter');
 
   // Advertise this table as a possible base table
@@ -148,11 +139,26 @@ function twitter_views_data() {
     ),
   );
 
+  // Twitter Web Intents.
+  $data['twitter']['web_intents'] = array(
+    'title' => t('Web Intents'),
+    'help' => t('Links to Reply, Retweet and Favorite a tweet.'),
+    'field' => array(
+      'handler' => 'twitter_views_handler_field_web_intents',
+    ),
+  );
 
+  // Follow link
+  $data['twitter']['follow'] = array(
+    'title' => t('Follow'),
+    'help' => t('Link to Follow a Twitter user.'),
+    'field' => array(
+      'handler' => 'twitter_views_handler_field_follow',
+    ),
+  );
 
-
+  // Table twitter_account.
   $data['twitter_account']['table']['group']  = t('Twitter');
-
   $data['twitter_account']['table']['join'] = array(
     'twitter' => array(
       'left_field' => 'screen_name',
@@ -315,7 +321,8 @@ function twitter_views_data() {
     'title' => t('User ID'),
     'help' => t('The UID of the Twitter account.'),
   );
-  // Twitter account protected
+
+  // Twitter account protected.
   $data['twitter_account']['import'] = array(
     'title' => t('Import status'),
     'help' => t('Whether posts from this Twitter account should be imported automatically.'),
@@ -351,7 +358,3 @@ function twitter_views_data_alter(&$data) {
     'field' => 'uid',
   );
 }
-
-/**
- * @}
- */
