@@ -69,15 +69,18 @@ function twitter_account_save($twitter_user, $save_auth = FALSE) {
 /**
  * Load a Twitter account from {twitter_account}.
  *
- * @param $id
- *   Twitter UID
+ * @param mixed $id
+ *   int Twitter User id or string Twitter user screen name.
  *
  * @return
  *   TwitterUser object or NULL.
- *
  */
 function twitter_account_load($id) {
-  if ($values = db_query("SELECT * FROM {twitter_account} WHERE twitter_uid = :twitter_uid", array(':twitter_uid' => $id))->fetchAssoc()) {
+  if ($values = db_query('SELECT *
+                          FROM {twitter_account}
+                          WHERE twitter_uid = :id
+                            OR screen_name  = :id',
+                          array(':id' => $id))->fetchAssoc()) {
     $values['id'] = $values['twitter_uid'];
     $account = new TwitterUser($values);
     $account->set_auth($values);
@@ -122,6 +125,20 @@ function twitter_load_authenticated_accounts() {
     }
   }
   return $auth_accounts;
+}
+
+/**
+ * Load a Twitter status.
+ *
+ * @param $status_id
+ *   The status id of this tweet.
+ *
+ * @return
+ *   An instance of stdClass object with the Tweet data or FALSE.
+ */
+function twitter_status_load($status_id) {
+  return db_query("SELECT * FROM {twitter} WHERE twitter_id = :status_id",
+           array(':status_id' => $status_id))->fetchObject();
 }
 
 /**

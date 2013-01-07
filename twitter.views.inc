@@ -78,7 +78,7 @@ function twitter_views_data() {
   // Twitter screen name
   $data['twitter']['screen_name'] = array(
     'title' => t('Login name'),
-    'help' => t('The login account of the Twitter user.'),
+    'help' => t('The screen name of the author of the tweet.'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -154,6 +154,15 @@ function twitter_views_data() {
     'help' => t('Link to Follow a Twitter user.'),
     'field' => array(
       'handler' => 'twitter_views_handler_field_follow',
+    ),
+  );
+
+  // Renders a formatted tweet.
+  $data['twitter']['formatted_tweet'] = array(
+    'title' => t('Formatted tweet'),
+    'help' => t('Renders a tweet as it is shown at Twitter.com.'),
+    'field' => array(
+      'handler' => 'twitter_views_handler_field_formatted_tweet',
     ),
   );
 

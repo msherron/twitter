@@ -80,6 +80,14 @@ function twitter_theme() {
     'twitter_account_list_form' => array(
       'render element' => 'form',
     ),
+    'twitter_status' => array(
+      'variables' => array(
+        'status' => NULL,
+        'author' => NULL,
+      ),
+      'template' => 'tweet',
+      'path' => drupal_get_path('module', 'twitter'),
+    ),
   );
 }
 
