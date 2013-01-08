@@ -125,7 +125,7 @@ function twitter_cron() {
   module_load_include('inc', 'twitter');
   $result = db_query_range("SELECT twitter_uid
                             FROM {twitter_account}
-                            WHERE added_by_uid <> 0 AND import = 1
+                            WHERE uid <> 0 AND import = 1
                             ORDER BY last_refresh ASC",
                             0, 20);
   try {
@@ -276,7 +276,7 @@ function twitter_twitter_accounts($account) {
 
   $query = db_select('twitter_account', 'ta')
     ->fields('ta', array('twitter_uid'))
-    ->condition('ta.added_by_uid', $account->uid);
+    ->condition('ta.uid', $account->uid);
 
   $twitter_accounts = array();
   foreach ($query->execute()->fetchCol() as $twitter_uid) {

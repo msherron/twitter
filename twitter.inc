@@ -102,7 +102,7 @@ function twitter_account_load_all() {
   $accounts = array();
   $result = db_query('SELECT twitter_uid
                       FROM {twitter_account}
-                      WHERE added_by_uid <> 0
+                      WHERE uid <> 0
                       ORDER BY screen_name');
   foreach ($result as $account) {
     $accounts[] = twitter_account_load($account->twitter_uid);

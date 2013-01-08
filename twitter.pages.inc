@@ -421,7 +421,7 @@ function twitter_oauth_callback_form_submit($form, &$form_state) {
   // Save the new Twitter account and set the user's uid who added it.
   $twitter_account->set_auth($response);
   global $user;
-  $twitter_account->added_by_uid = $user->uid;
+  $twitter_account->uid = $user->uid;
   twitter_account_save($twitter_account, TRUE);
 
   $form_state['programmed'] = FALSE;
@@ -461,7 +461,7 @@ function twitter_non_auth_account_form_submit($form, &$form_state) {
   }
   else {
     global $user;
-    $twitter_account->added_by_uid = $user->uid;
+    $twitter_account->uid = $user->uid;
     twitter_account_save($twitter_account, FALSE);
     drupal_set_message(t('Twitter account added successfully'));
   }

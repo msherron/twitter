@@ -132,7 +132,7 @@ function twitter_signin_oauth_callback_submit(&$form, &$form_state) {
     user_external_login($account, $response);
     $success = TRUE;
   }
-  elseif ($uid = db_query("SELECT added_by_uid FROM {twitter_account} WHERE twitter_uid = :twitter_uid",
+  elseif ($uid = db_query("SELECT uid FROM {twitter_account} WHERE twitter_uid = :twitter_uid",
                           array(':twitter_uid' => $response['user_id']))->fetchField()) {
     // We have an existing Twitter account - set it up for login.
     $account = user_load($uid);
@@ -231,7 +231,7 @@ function _twitter_signin_add_account($edit, $account) {
       return;
     }
     $twitter_account->set_auth($response);
-    $twitter_account->added_by_uid = $account->uid;
+    $twitter_account->uid = $account->uid;
     twitter_account_save($twitter_account, TRUE);
 
     unset($_SESSION['twitter']);

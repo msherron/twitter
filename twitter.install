@@ -296,14 +296,14 @@ function twitter_schema() {
         'default' => 0,
       ),
       'is_global' => array(
-        'description' => "Boolean flag indicating if this account is available for global use",
+        'description' => "Boolean flag indicating if this account is available for global use.",
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
       ),
-      'added_by_uid' => array(
-        'description' => "The uid of the user who added this Twitter account",
+      'uid' => array(
+        'description' => "The uid of the user who added this Twitter account.",
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -383,10 +383,10 @@ function twitter_update_7400() {
 
 /**
  * Drops field uid at twitter_account.
+ *
+ * This update has been set empty afterwards as the field is actually needed.
  */
-function twitter_update_7401() {
-  db_drop_field('twitter_account', 'uid');
-}
+function twitter_update_7401() {}
 
 /**
  * Makes the import field not enabled by default at twitter_account table.
@@ -405,14 +405,25 @@ function twitter_update_7402() {
 
 /**
  * Adds field added_by_uid to twitter_account table.
+ *
+ * This update has been set empty afterwards as the existing field twitter_account.uid is used.
  */
-function twitter_update_7403() {
-  $data = array(
-    'description' => "The uid of the user who added this Twitter account",
-    'type' => 'int',
-    'unsigned' => TRUE,
-    'not null' => TRUE,
-    'default' => 0,
-  );
-  db_add_field('twitter_account', 'added_by_uid', $data);
+function twitter_update_7403() {}
+
+/**
+ * Renames twitter_account.added_by_uid to twitter_account.uid.
+ *
+ * This reverts update 7403.
+ */
+function twitter_update_7500() {
+  if (db_field_exists('twitter_account', 'added_by_uid')) {
+    $spec = array(
+      'description' => "The uid of the user who added this Twitter account.",
+      'type' => 'int',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'default' => 0,
+    );
+    db_change_field('twitter_account', 'added_by_uid', 'uid', $spec);
+  }
 }
