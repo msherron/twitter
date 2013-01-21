@@ -1343,7 +1343,10 @@ class TwitterUser {
     $this->profile_background_tile = $values['profile_background_tile'];
     $this->verified = $values['verified'];
     $this->created_at = $values['created_at'];
-    if ($values['created_at'] && $created_time = strtotime($values['created_at'])) {
+    if (!empty($values['uid'])) {
+      $this->uid = $values['uid'];
+    }
+    if (!empty($values['created_at']) && $created_time = strtotime($values['created_at'])) {
       $this->created_time = $created_time;
     }
     $this->utc_offset = $values['utc_offset']?$values['utc_offset']:0;

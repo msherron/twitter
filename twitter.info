@@ -6,4 +6,5 @@ files[] = twitter_views_field_handlers.inc
 files[] = tests/core.test
 files[] = tests/input_filters.test
 dependencies[] = oauth_common
+dependencies[] = views
 configure = admin/config/services/twitter

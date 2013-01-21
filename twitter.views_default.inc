@@ -78,11 +78,11 @@ function twitter_views_default_views() {
   $handler->display->display_options['filters']['protected']['group'] = '0';
   $handler->display->display_options['filters']['protected']['expose']['operator'] = FALSE;
 
-  /* Display: Tweets */
-  $handler = $view->new_display('page', 'Tweets', 'page_all_tweets');
+  /* Display: Tweets Raw */
+  $handler = $view->new_display('page', 'Tweets Raw', 'page_all_tweets');
   $handler->display->display_options['defaults']['title'] = FALSE;
   $handler->display->display_options['title'] = 'Tweets';
-  $handler->display->display_options['display_description'] = 'Lists unprotected tweets.';
+  $handler->display->display_options['display_description'] = 'Lists tweets within a table.';
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['defaults']['pager'] = FALSE;
   $handler->display->display_options['pager']['type'] = 'full';
@@ -226,12 +226,14 @@ function twitter_views_default_views() {
   $handler->display->display_options['arguments']['screen_name']['id'] = 'screen_name';
   $handler->display->display_options['arguments']['screen_name']['table'] = 'twitter';
   $handler->display->display_options['arguments']['screen_name']['field'] = 'screen_name';
+  $handler->display->display_options['arguments']['screen_name']['title_enable'] = TRUE;
+  $handler->display->display_options['arguments']['screen_name']['title'] = 'Tweets by @%1';
   $handler->display->display_options['arguments']['screen_name']['default_argument_type'] = 'fixed';
   $handler->display->display_options['arguments']['screen_name']['summary']['number_of_records'] = '0';
   $handler->display->display_options['arguments']['screen_name']['summary']['format'] = 'default_summary';
   $handler->display->display_options['arguments']['screen_name']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['arguments']['screen_name']['limit'] = '0';
-  $handler->display->display_options['path'] = 'tweets';
+  $handler->display->display_options['path'] = 'tweets-raw';
 
   /* Display: Block */
   $handler = $view->new_display('block', 'Block', 'block');
@@ -269,6 +271,52 @@ function twitter_views_default_views() {
   $handler->display->display_options['fields']['created_time']['date_format'] = 'time ago';
   $handler->display->display_options['defaults']['arguments'] = FALSE;
   $handler->display->display_options['block_description'] = 'Tweets';
+
+  /* Display: Tweets */
+  $handler = $view->new_display('page', 'Tweets', 'page_2');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Tweets';
+  $handler->display->display_options['display_description'] = 'Displays a formatted list of tweets';
+  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  $handler->display->display_options['defaults']['pager'] = FALSE;
+  $handler->display->display_options['pager']['type'] = 'full';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '20';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['pager']['options']['id'] = '0';
+  $handler->display->display_options['pager']['options']['quantity'] = '9';
+  $handler->display->display_options['defaults']['style_plugin'] = FALSE;
+  $handler->display->display_options['style_plugin'] = 'list';
+  $handler->display->display_options['defaults']['style_options'] = FALSE;
+  $handler->display->display_options['defaults']['row_plugin'] = FALSE;
+  $handler->display->display_options['row_plugin'] = 'fields';
+  $handler->display->display_options['defaults']['row_options'] = FALSE;
+  $handler->display->display_options['defaults']['fields'] = FALSE;
+  /* Field: Twitter: Twitter status message ID */
+  $handler->display->display_options['fields']['twitter_id']['id'] = 'twitter_id';
+  $handler->display->display_options['fields']['twitter_id']['table'] = 'twitter';
+  $handler->display->display_options['fields']['twitter_id']['field'] = 'twitter_id';
+  $handler->display->display_options['fields']['twitter_id']['label'] = '';
+  $handler->display->display_options['fields']['twitter_id']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['twitter_id']['element_label_colon'] = FALSE;
+  /* Field: Twitter: Formatted tweet */
+  $handler->display->display_options['fields']['formatted_tweet']['id'] = 'formatted_tweet';
+  $handler->display->display_options['fields']['formatted_tweet']['table'] = 'twitter';
+  $handler->display->display_options['fields']['formatted_tweet']['field'] = 'formatted_tweet';
+  $handler->display->display_options['fields']['formatted_tweet']['label'] = '';
+  $handler->display->display_options['fields']['formatted_tweet']['element_label_colon'] = FALSE;
+  $handler->display->display_options['defaults']['arguments'] = FALSE;
+  /* Contextual filter: Twitter: Login name */
+  $handler->display->display_options['arguments']['screen_name']['id'] = 'screen_name';
+  $handler->display->display_options['arguments']['screen_name']['table'] = 'twitter';
+  $handler->display->display_options['arguments']['screen_name']['field'] = 'screen_name';
+  $handler->display->display_options['arguments']['screen_name']['title_enable'] = TRUE;
+  $handler->display->display_options['arguments']['screen_name']['title'] = 'Tweets by @%1';
+  $handler->display->display_options['arguments']['screen_name']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['screen_name']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['screen_name']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['screen_name']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['screen_name']['limit'] = '0';
+  $handler->display->display_options['path'] = 'tweets';
 
   return array('tweets' => $view);
 }
