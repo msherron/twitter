@@ -330,6 +330,7 @@ function twitter_twitter_accounts($account) {
  * Removes user's Twitter accounts and tweets
  */
 function twitter_user_delete($account) {
+  module_load_include('inc', 'twitter');
   foreach ($account->twitter_accounts as $twitter_account) {
     twitter_account_delete($twitter_account->id);
   }
