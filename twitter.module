@@ -157,11 +157,16 @@ function twitter_cron() {
   if (!variable_get('twitter_import', TRUE)) {
     return;
   }
+  // Check if we can connect to Twitter before proceeding.
+  module_load_include('inc', 'twitter');
+  $twitter = twitter_connect();
+  if (!$twitter) {
+    return;
+  }
 
   // Pull up a list of Twitter accounts that are flagged for updating,
   // sorted by how long it's been since we last updated them. This ensures
   // that the most out-of-date accounts get updated first.
-  module_load_include('inc', 'twitter');
   $result = db_query_range("SELECT twitter_uid
                             FROM {twitter_account}
                             WHERE uid <> 0 AND import = 1
