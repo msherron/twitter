@@ -22,9 +22,9 @@ function twitter_post_menu() {
 }
 
 /**
- * Implements hook_permission().
+ * Implements hook_perm().
  */
-function twitter_post_permission() {
+function twitter_post_perm() {
   return array(
     'post to twitter' => array(
       'title' => t('Post a message to Twitter'),
