@@ -23,6 +23,7 @@ function twitter_connect($account = NULL) {
     $accounts = twitter_load_authenticated_accounts();
     if (count($accounts)) {
       $account = reset($accounts);
+    }
   }
 
   if ($account) {
@@ -99,7 +100,7 @@ function twitter_load_accounts() {
     ->propertyOrderBy('screen_name');
   $result = $query->execute();
 
-  return entity_load('twitter_account', $result['twitter_account']);
+  return entity_load('twitter_account', array_keys($result['twitter_account']));
 }
 
 /**
