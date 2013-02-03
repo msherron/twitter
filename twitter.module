@@ -208,7 +208,7 @@ function twitter_cron() {
     foreach ($result as $account) {
       // Fetch tweets and mentions.
       twitter_fetch_user_timeline($account->twitter_uid);
-      $twitter_account = twitter_account_load($account->twitter_uid);
+      $twitter_account = entity_load_single('twitter_account', $account->twitter_uid);
       if ($twitter_account->is_auth() && $twitter_account->mentions) {
         twitter_fetch_mentions_timeline($twitter_account->id);
       }
@@ -352,10 +352,6 @@ function twitter_twitter_accounts($account) {
   $query->entityCondition('entity_type', 'twitter_account')
     ->propertyCondition('uid', $account->uid);
   $result = $query->execute();
-
-  if (!count($result['twitter_account'])) {
-    return;
-  }
 
   $twitter_accounts = entity_load('twitter_account', array_keys($result['twitter_account']));
   return $twitter_accounts;

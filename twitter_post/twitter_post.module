@@ -80,7 +80,7 @@ function twitter_post_node_insert($node) {
   if (!empty($node->status) && !empty($node->twitter) && !empty($node->twitter['post'])) {
     module_load_include('inc', 'twitter');
 
-    $twitter_account = twitter_account_load($node->twitter['account']);
+    $twitter_account = entity_load_single('twitter_account', $node->twitter['account']);
     $replacements = array(
       '!title' => $node->title,
       '!url' => url('node/' . $node->nid, array('absolute' => TRUE, 'alias' => TRUE)),

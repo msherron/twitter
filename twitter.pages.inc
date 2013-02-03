@@ -94,7 +94,7 @@ function twitter_user_settings($account = NULL) {
   else {
     module_load_include('inc', 'twitter');
     if (!$account) {
-      $twitter_accounts = entity_load('twitter_account');
+      $twitter_accounts = twitter_load_accounts();
     }
     else {
       $twitter_accounts = twitter_twitter_accounts($account);
@@ -287,7 +287,7 @@ function twitter_account_list_form_submit($form, &$form_state) {
       twitter_account_save($account);
     }
     else {
-      $twitter_account = twitter_account_load($account['id']);
+      $twitter_account = entity_load_single('twitter_account', $account['id']);
       twitter_account_delete($account['id']);
       drupal_set_message(t('The Twitter account <em>!account</em> was deleted.',
         array('!account' => $twitter_account->screen_name)));
