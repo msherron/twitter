@@ -37,7 +37,7 @@ function twitter_connect($account = NULL) {
 }
 
 /**
- * Saves a TwitterUser object to {twitter_account}
+ * Saves a TwitterAccount object to {twitter_account}
  */
 function twitter_account_save($twitter_user, $save_auth = FALSE) {
   $values = (array) $twitter_user;
@@ -73,7 +73,7 @@ function twitter_account_save($twitter_user, $save_auth = FALSE) {
  *   int Twitter User id or string Twitter user screen name.
  *
  * @return
- *   TwitterUser object or NULL.
+ *   TwitterAccount object or NULL.
  */
 function twitter_account_load($id) {
   if ($values = db_query('SELECT *
@@ -82,7 +82,7 @@ function twitter_account_load($id) {
                             OR screen_name  = :id',
                           array(':id' => $id))->fetchAssoc()) {
     $values['id'] = $values['twitter_uid'];
-    $account = new TwitterUser($values);
+    $account = new TwitterAccount($values);
     $account->set_auth($values);
     $account->import = $values['import'];
     $account->mentions = $values['mentions'];
@@ -96,7 +96,7 @@ function twitter_account_load($id) {
  * Loads all Twitter accounts added by a user.
  *
  * @return
- *   array of TwitterUser objects.
+ *   array of TwitterAccount objects.
  */
 function twitter_account_load_all() {
   $accounts = array();
@@ -114,7 +114,7 @@ function twitter_account_load_all() {
  * Returns a list of authenticated Twitter accounts.
  *
  * @return
- *   array of TwitterUser objects.
+ *   array of TwitterAccount objects.
  */
 function twitter_load_authenticated_accounts() {
   $accounts = twitter_account_load_all();

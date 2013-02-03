@@ -10,6 +10,38 @@ define ('TWITTER_SEARCH',       'http://search.twitter.com');
 define ('TWITTER_TINYURL',      'http://tinyurl.com');
 
 /**
+ * Implements hook_entity_info().
+ */
+function twitter_entity_info() {
+  return array(
+    'twitter_status' => array(
+      'label' => t('Twitter Status'),
+      'module' => 'twitter',
+      'entity class' => 'TwitterStatus',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'twitter',
+      'entity keys' => array(
+        'id' => 'twitter_id',
+      ),
+      'label callback' => 'entity_class_label',
+      'uri callback' => 'entity_class_uri',
+    ),
+    'twitter_account' => array(
+      'label' => t('Twitter Account'),
+      'module' => 'twitter',
+      'entity class' => 'TwitterAccount',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'twitter_account',
+      'entity keys' => array(
+        'id' => 'twitter_uid',
+      ),
+      'label callback' => 'entity_class_label',
+      'uri callback' => 'entity_class_uri',
+    ),
+  );
+}
+
+/**
  * Implements hook_menu().
  */
 function twitter_menu() {
@@ -316,16 +348,16 @@ function twitter_user_load($accounts) {
  *   array with Twitter accounts
  */
 function twitter_twitter_accounts($account) {
-  module_load_include('inc', 'twitter');
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'twitter_account')
+    ->propertyCondition('uid', $account->uid);
+  $result = $query->execute();
 
-  $query = db_select('twitter_account', 'ta')
-    ->fields('ta', array('twitter_uid'))
-    ->condition('ta.uid', $account->uid);
-
-  $twitter_accounts = array();
-  foreach ($query->execute()->fetchCol() as $twitter_uid) {
-    $twitter_accounts[] = twitter_account_load($twitter_uid);
+  if (!count($result['twitter_account'])) {
+    return;
   }
+
+  $twitter_accounts = entity_load('twitter_account', array_keys($result['twitter_account']));
   return $twitter_accounts;
 }
 
@@ -375,4 +407,143 @@ function twitter_api_keys() {
  */
 function _twitter_user_profile($screen_name) {
   return l('@' . $screen_name, TWITTER_HOST . '/' . $screen_name);
+}
+
+/**
+ * Class for containing an individual twitter status.
+ */
+class TwitterStatus extends Entity {
+  /**
+   * @var created_at
+   */
+  public $created_at;
+
+  public $id;
+
+  public $text;
+
+  public $source;
+
+  public $truncated;
+
+  public $favorited;
+
+  public $in_reply_to_status_id;
+
+  public $in_reply_to_user_id;
+
+  public $in_reply_to_screen_name;
+
+  public $user;
+
+  /**
+   * Constructor for TwitterStatus
+   */
+  public function __construct($values = array()) {
+    parent::__construct($values, 'twitter_status');
+    if (isset($values['user'])) {
+      $this->user = new TwitterAccount($values['user']);
+    }
+  }
+}
+
+class TwitterAccount extends Entity {
+
+  public $id;
+
+  public $screen_name;
+
+  public $name;
+
+  public $location;
+
+  public $description;
+
+  public $followers_count;
+
+  public $friends_count;
+
+  public $statuses_count;
+
+  public $favourites_count;
+
+  public $url;
+
+  public $protected;
+
+  public $profile_image_url;
+
+  public $profile_background_color;
+
+  public $profile_text_color;
+
+  public $profile_link_color;
+
+  public $profile_sidebar_fill_color;
+
+  public $profile_sidebar_border_color;
+
+  public $profile_background_image_url;
+
+  public $profile_background_tile;
+
+  public $verified;
+
+  public $created_at;
+
+  public $created_time;
+
+  public $utc_offset;
+
+  public $status;
+
+  protected $oauth_token;
+
+  protected $oauth_token_secret;
+
+  public function __construct($values = array()) {
+    parent::__construct($values, 'twitter_account');
+
+    if (!empty($values['uid'])) {
+      $this->uid = $values['uid'];
+    }
+    if (!empty($values['created_at']) && $created_time = strtotime($values['created_at'])) {
+      $this->created_time = $created_time;
+    }
+    $this->utc_offset = isset($values['utc_offset'])?$values['utc_offset']:0;
+    if (isset($values['status'])) {
+      $this->status = new TwitterStatus($values['status']);
+    }
+  }
+
+  /**
+   * Returns an array with the authentication tokens.
+   *
+   * @return
+   *   array with the oauth token key and secret.
+   */
+  public function get_auth() {
+    return array('oauth_token' => $this->oauth_token, 'oauth_token_secret' => $this->oauth_token_secret);
+  }
+
+  /**
+   * Sets the authentication tokens to a user.
+   *
+   * @param array $values
+   *   Array with 'oauth_token' and 'oauth_token_secret' keys.
+   */
+  public function set_auth($values) {
+    $this->oauth_token = isset($values['oauth_token'])?$values['oauth_token']:NULL;
+    $this->oauth_token_secret = isset($values['oauth_token_secret'])?$values['oauth_token_secret']:NULL;
+  }
+
+  /**
+   * Checks whether the account is authenticated or not.
+   *
+   * @return
+   *   boolean TRUE when the account is authenticated.
+   */
+  public function is_auth() {
+    return !empty($this->oauth_token) && !empty($this->oauth_token_secret);
+  }
 }

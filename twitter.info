@@ -7,4 +7,5 @@ files[] = tests/core.test
 files[] = tests/input_filters.test
 dependencies[] = oauth_common
 dependencies[] = views
+dependencies[] = entity
 configure = admin/config/services/twitter

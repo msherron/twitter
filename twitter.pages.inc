@@ -94,7 +94,7 @@ function twitter_user_settings($account = NULL) {
   else {
     module_load_include('inc', 'twitter');
     if (!$account) {
-      $twitter_accounts = twitter_account_load_all();
+      $twitter_accounts = entity_load('twitter_account');
     }
     else {
       $twitter_accounts = twitter_twitter_accounts($account);
