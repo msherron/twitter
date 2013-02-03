@@ -131,24 +131,24 @@ class twitter_views_handler_field_formatted_tweet extends views_handler_field {
     module_load_include('inc', 'twitter');
 
     // Load tweet and author.
-    $status = twitter_status_load($values->twitter_id);
-    $author = entity_load_single('twitter_account', ($status->screen_name);
+    $twitter_status = entity_load_single('twitter_status', $values->twitter_id);
+    $twitter_account = entity_load_single('twitter_account', $status->screen_name);
 
     // Format the timestamp.
     $time_diff = REQUEST_TIME - $values->twitter_created_time;
 
     // Format the message.
-    $status->time_ago = t('%time ago', array('%time' => format_interval($time_diff, 2)));
+    $twitter_status->time_ago = t('%time ago', array('%time' => format_interval($time_diff, 2)));
     $filter = new stdClass;
       $filter->settings = array(
         'filter_url_length' => 496,
       );
-    $status->text = _filter_url($status->text, $filter);
+    $twitter_status->text = _filter_url($twitter_status->text, $filter);
 
     // Render the tweet.
     return theme('twitter_status', array(
-      'status' => $status,
-      'author' => $author,
+      'status' => $twitter_status,
+      'author' => $twitter_account,
     ));
   }
 }

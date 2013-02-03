@@ -199,26 +199,26 @@ function twitter_cron() {
   // Pull up a list of Twitter accounts that are flagged for updating,
   // sorted by how long it's been since we last updated them. This ensures
   // that the most out-of-date accounts get updated first.
-  $result = db_query_range("SELECT twitter_uid
-                            FROM {twitter_account}
-                            WHERE uid <> 0 AND import = 1
-                            ORDER BY last_refresh ASC",
-                            0, 20);
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'twitter_account')
+    ->propertyCondition('uid', 0, '<>')
+    ->propertyCondition('import', 1)
+    ->propertyOrderBy('last_refresh')
+    ->range(0, 20);
+  $result = $query->execute();
+  $twitter_accounts = entity_load('twitter_account', array_keys($result['twitter_account']));
+
+  // Iterate over Twitter accounts and fetch tweets.
   try {
-    foreach ($result as $account) {
+    foreach ($twitter_accounts as $twitter_account) {
       // Fetch tweets and mentions.
-      twitter_fetch_user_timeline($account->twitter_uid);
-      $twitter_account = entity_load_single('twitter_account', $account->twitter_uid);
+      twitter_fetch_user_timeline($twitter_account->twitter_uid);
       if ($twitter_account->is_auth() && $twitter_account->mentions) {
         twitter_fetch_mentions_timeline($twitter_account->id);
       }
       // Mark the time this account was updated.
-      db_update('twitter_account')
-        ->fields(array(
-          'last_refresh' => REQUEST_TIME,
-        ))
-        ->condition('twitter_uid', $twitter_account->id)
-        ->execute();
+      $twitter_account->last_refresh = REQUEST_TIME;
+      entity_save('twitter_account', $twitter_account);
     }
   } catch (TwitterException $e) {
     // The exception has already been logged so we do not need to do anything here apart from catching it.
@@ -226,9 +226,11 @@ function twitter_cron() {
 
   // Nuke old statuses.
   if ($age = variable_get('twitter_expire', 0)) {
-    db_delete('twitter')
-      ->condition('created_time', REQUEST_TIME - $age, '<')
-      ->execute();
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'twitter_account')
+      ->propertyCondition('created_time', REQUEST_TIME - $age, '<');
+    $result = $query->execute();
+    entity_delete_multiple('twitter_account', array_keys($result['twitter_account']));
   }
 }
 
@@ -363,10 +365,7 @@ function twitter_twitter_accounts($account) {
  * Removes user's Twitter accounts and tweets
  */
 function twitter_user_delete($account) {
-  module_load_include('inc', 'twitter');
-  foreach ($account->twitter_accounts as $twitter_account) {
-    twitter_account_delete($twitter_account->id);
-  }
+  entity_delete_multiple('twitter_account', array_keys($account->twitter_accounts));
 }
 
 /**
@@ -497,6 +496,9 @@ class TwitterAccount extends Entity {
 
   protected $oauth_token_secret;
 
+  /**
+   * Constructor
+   */
   public function __construct($values = array()) {
     parent::__construct($values, 'twitter_account');
 

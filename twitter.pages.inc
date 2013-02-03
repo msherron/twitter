@@ -164,9 +164,9 @@ function twitter_account_list_form($form, $form_state, $twitter_accounts = array
 function _twitter_account_list_row($account) {
   $form['#account'] = $account;
 
-  $form['id'] = array(
+  $form['twitter_uid'] = array(
     '#type' => 'value',
-    '#value' => $account->id,
+    '#value' => $account->twitter_uid,
   );
 
   $form['screen_name'] = array(
@@ -284,7 +284,8 @@ function twitter_account_list_form_submit($form, &$form_state) {
   $accounts = $form_state['values']['accounts'];
   foreach ($accounts as $account) {
     if (empty($account['delete'])) {
-      twitter_account_save($account);
+      $twitter_account = new TwitterAccount($account);
+      entity_save('twitter_account', $twitter_account);
     }
     else {
       $twitter_account = entity_load_single('twitter_account', $account['id']);
@@ -450,7 +451,7 @@ function twitter_oauth_callback_form_submit($form, &$form_state) {
   $twitter_account->set_auth($response);
   global $user;
   $twitter_account->uid = $user->uid;
-  twitter_account_save($twitter_account, TRUE);
+  entity_save('twitter_account', $twitter_account);
 
   $form_state['programmed'] = FALSE;
   $form_state['redirect'] = $form_state['twitter_oauth']['destination'];
@@ -501,7 +502,7 @@ function twitter_non_auth_account_form_submit($form, &$form_state) {
   else {
     global $user;
     $twitter_account->uid = $user->uid;
-    twitter_account_save($twitter_account, FALSE);
+    entity_save('twitter_account', $twitter_account);
     drupal_set_message(t('Twitter account added successfully'));
   }
 }
