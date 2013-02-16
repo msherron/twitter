@@ -355,7 +355,8 @@ function twitter_twitter_accounts($account) {
     ->propertyCondition('uid', $account->uid);
   $result = $query->execute();
 
-  $twitter_accounts = entity_load('twitter_account', array_keys($result['twitter_account']));
+  $ids = !empty($result['twitter_account']) ? array_keys($result['twitter_account']) : array();
+  $twitter_accounts = entity_load('twitter_account', $ids);
   return $twitter_accounts;
 }
 
@@ -492,26 +493,29 @@ class TwitterAccount extends Entity {
 
   public $status;
 
-  protected $oauth_token;
+  public $oauth_token;
 
-  protected $oauth_token_secret;
+  public $oauth_token_secret;
 
   /**
    * Constructor
    */
   public function __construct($values = array()) {
-    parent::__construct($values, 'twitter_account');
-
-    if (!empty($values['uid'])) {
-      $this->uid = $values['uid'];
+    // Prepare values to match twitter_account table fields.
+    if (!empty($values['id'])) {
+      $values['twitter_uid'] = $values['id'];
+      unset($values['id']);
     }
     if (!empty($values['created_at']) && $created_time = strtotime($values['created_at'])) {
-      $this->created_time = $created_time;
+      $values['created_time'] = $created_time;
     }
-    $this->utc_offset = isset($values['utc_offset'])?$values['utc_offset']:0;
+
+    $values['utc_offset'] = isset($values['utc_offset']) ? $values['utc_offset'] : 0;
     if (isset($values['status'])) {
       $this->status = new TwitterStatus($values['status']);
+      unset($values['status']);
     }
+    parent::__construct($values, 'twitter_account');
   }
 
   /**

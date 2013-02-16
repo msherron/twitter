@@ -283,13 +283,14 @@ function theme_twitter_account_list_form($variables) {
 function twitter_account_list_form_submit($form, &$form_state) {
   $accounts = $form_state['values']['accounts'];
   foreach ($accounts as $account) {
+    $twitter_account = entity_load_single('twitter_account', $account['twitter_uid']);
     if (empty($account['delete'])) {
-      $twitter_account = new TwitterAccount($account);
+      $twitter_account->import = $account['import'];
+      $twitter_account->mentions = $account['mentions'];
       entity_save('twitter_account', $twitter_account);
     }
     else {
-      $twitter_account = entity_load_single('twitter_account', $account['id']);
-      twitter_account_delete($account['id']);
+      twitter_account_delete($account['twitter_uid']);
       drupal_set_message(t('The Twitter account <em>!account</em> was deleted.',
         array('!account' => $twitter_account->screen_name)));
     }
@@ -451,6 +452,7 @@ function twitter_oauth_callback_form_submit($form, &$form_state) {
   $twitter_account->set_auth($response);
   global $user;
   $twitter_account->uid = $user->uid;
+  $twitter_account->is_new = TRUE;
   entity_save('twitter_account', $twitter_account);
 
   $form_state['programmed'] = FALSE;

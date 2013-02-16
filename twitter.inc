@@ -69,7 +69,8 @@ function twitter_load_accounts() {
     ->propertyOrderBy('screen_name');
   $result = $query->execute();
 
-  return entity_load('twitter_account', array_keys($result['twitter_account']));
+  $ids = !empty($result['twitter_account']) ? array_keys($result['twitter_account']) : array();
+  return entity_load('twitter_account', $ids);
 }
 
 /**
@@ -180,7 +181,8 @@ function twitter_tweets($screen_name = NULL) {
     $query->entityCondition('screen_name', $screen_name);
   }
   $result = $query->execute();
-  $twitter_statuses = entity_load('twitter_status', array_keys($result['twitter_status']));
+  $ids = !empty($result['twitter_status']) ? array_keys($result['twitter_status']) : array();
+  $twitter_statuses = entity_load('twitter_status', $ids);
 
   return $twitter_statuses;
 }
@@ -199,7 +201,7 @@ function twitter_account_delete($twitter_uid) {
 
   // Delete from {twitter}.
   $twitter_statuses = twitter_tweets($account->screen_name);
-  entity_delete('twitter_status', array_keys($twitter_statuses));
+  entity_delete_multiple('twitter_status', array_keys($twitter_statuses));
 
   // Delete from {authmap}.
   $query = db_delete('authmap');
