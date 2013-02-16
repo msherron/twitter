@@ -41,7 +41,7 @@ function twitter_connect($account = NULL) {
  * @param string $screen_name
  *   A Twitter account name.
  * @return
- *   A TwitterAccount object or NULL.
+ *   A TwitterAccount object or FALSE.
  */
 function twitter_account_load($screen_name) {
   $query = new EntityFieldQuery();
@@ -49,8 +49,8 @@ function twitter_account_load($screen_name) {
     ->propertyCondition('screen_name', $screen_name);
   $result = $query->execute();
 
-  $twitter_accounts = entity_load('twitter_account', array_keys($result['twitter_account']));
-  return empty($twitter_accounts) ? NULL : array_pop($twitter_accounts);
+  $ids = !empty($result['twitter_account']) ? array_keys($result['twitter_account']) : array();
+  return entity_load_single('twitter_account', reset($ids));
 }
 
 /**

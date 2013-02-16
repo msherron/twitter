@@ -504,6 +504,7 @@ function twitter_non_auth_account_form_submit($form, &$form_state) {
   else {
     global $user;
     $twitter_account->uid = $user->uid;
+    $twitter_account->is_new = TRUE;
     entity_save('twitter_account', $twitter_account);
     drupal_set_message(t('Twitter account added successfully'));
   }
