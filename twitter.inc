@@ -50,7 +50,12 @@ function twitter_account_load($screen_name) {
   $result = $query->execute();
 
   $ids = !empty($result['twitter_account']) ? array_keys($result['twitter_account']) : array();
-  return entity_load_single('twitter_account', reset($ids));
+  if (count($ids)) {
+    return entity_load_single('twitter_account', array_pop($ids));
+  }
+  else {
+    return FALSE;
+  }
 }
 
 /**
@@ -70,7 +75,12 @@ function twitter_load_accounts() {
   $result = $query->execute();
 
   $ids = !empty($result['twitter_account']) ? array_keys($result['twitter_account']) : array();
-  return entity_load('twitter_account', $ids);
+  if (count($ids)) {
+    return entity_load('twitter_account', $ids);
+  }
+  else {
+    return array();
+  }
 }
 
 /**
