@@ -10,32 +10,16 @@
 function twitter_post_field_info() {
   return array(
     'twitter_post' => array(
-      'label' => t('Post to Twitter'),
+      'label' => t('Twitter'),
       'description' => t('Allows posting to Twitter.com.'),
       'instance_settings' => array(
         'status' => 1,
         'format' => 'New post: !title !url-alias',
       ),
       'default_widget' => 'twitter_post_widget',
+      'default_formatter' => 'text_text',
     ),
   );
-}
-
-/**
- * Implements hook_field_settings_form().
- */
-function twitter_post_field_settings_form($field, $instance) {
-  $defaults = field_info_field_settings($field['type']);
-  $settings = array_merge($defaults, $field['settings']);
-
-  $form['test'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Upload destination'),
-    '#default_value' => $settings['test'],
-    '#description' => t('Select where the final files should be stored. Private file storage has significantly more overhead than public files, but allows restricted access to files within this field.'),
-  );
-
-  return $form;
 }
 
 /**
@@ -71,27 +55,10 @@ function twitter_post_field_instance_settings_form($field, $instance) {
 function twitter_post_field_widget_info() {
   return array(
     'twitter_post_widget'=> array(
-      'label' => t('Default Twitter field'),
+      'label' => t('Post to Twitter'),
       'field types' => array('twitter_post'),
     ),
   );
-}
-
-/**
- * Implements hook_field_widget_settings_form().
- */
-function twitter_post_field_widget_settings_form($field, $instance) {
-  $widget = $instance['widget'];
-  $settings = $widget['settings'];
-
-  $form['preview'] = array(
-    '#title' => t('Preview image style'),
-    '#type' => 'textfield',
-    '#default_value' => $settings['preview'],
-    '#description' => t('The preview image will be shown while editing the content.'),
-  );
-
-  return $form;
 }
 
 /**
@@ -118,6 +85,8 @@ function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance,
       '#id' => 'twitter-toggle',
     ),
     'status' => array(
+      '#type' => 'textfield',
+      '#title' => t('Twiter.com status'),
       '#default_value' => $format,
       '#description' => t('The given text will be posted to twitter.com. You can use !url, !url-alias, !tinyurl, !title and !user as replacement text.'),
       '#maxlength' => 150,
