@@ -62,6 +62,7 @@ function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance,
       '#attached' => array(
         'js' => array(drupal_get_path('module', 'twitter_post') . '/twitter_post.js'),
       ),
+      '#attributes' => array('class' => array('twitter-post-message')),
     ),
   );
 
