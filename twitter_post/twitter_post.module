@@ -4,6 +4,9 @@
  * Hook implementations for twitter_post module.
  */
 
+// Field API definitions.
+require_once 'twitter_post.field.inc';
+
 /**
  * Implements hook_menu().
  */

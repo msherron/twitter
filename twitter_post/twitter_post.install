@@ -2,16 +2,40 @@
 /**
  * @file
  * Install, update and uninstall functions for the twitter module.
- *
  */
+
+/**
+ * Implement hook_field_schema().
+ */
+function twitter_post_field_schema($field) {
+  $columns = array();
+  $indexes = array();
+  if ($field['type'] == 'twitter_post_tweet') {
+    $columns = array(
+      'status' => array(
+        'type' => 'boolean',
+        'not null' => TRUE,
+      ),
+      'format' => array(
+        'type' => 'varchar',
+        'length' => 150,
+        'not null' => TRUE,
+      ),
+    );
+    $indexes = array();
+  }
+  return array('columns' => $columns, 'indexes' => $indexes);
+}
+
+/**
+ * Implements hook_install().
+ */
+function twitter_post_install() {}
 
 /**
  * Implements hook_uninstall().
  */
 function twitter_post_uninstall() {
-  variable_del('twitter_post_types');
-  variable_del('twitter_post_default_format');
-  variable_del('twitter_post_default_value');
 }
 
 /**
