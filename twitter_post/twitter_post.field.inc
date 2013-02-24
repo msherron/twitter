@@ -38,7 +38,7 @@ function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance,
     return $element;
   }
 
-  $status = isset($items[$delta]['status']) ? $items[$delta]['status'] : TRUE;
+  $status = isset($items[$delta]['status']) ? $items[$delta]['status'] : FALSE;
   $message = isset($items[$delta]['message']) ? $items[$delta]['message'] : t('New post: !title !url-alias');
   $element += array(
     '#type' => 'fieldset',

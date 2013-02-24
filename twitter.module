@@ -406,6 +406,16 @@ function _twitter_user_profile($screen_name) {
 }
 
 /**
+ * Helper to build a Twitter status URL.
+ *
+ * @param object $status
+ *   A TwitterStatus object.
+ */
+function _twitter_status_url($status) {
+  return TWITTER_HOST . '/' . $status->user->screen_name . '/status/' . $status->id;
+}
+
+/**
  * Class for containing an individual twitter status.
  */
 class TwitterStatus extends Entity {
