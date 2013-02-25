@@ -64,6 +64,20 @@ function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance,
       ),
       '#attributes' => array('class' => array('twitter-post-message')),
     ),
+    'token_help' => array(
+      '#title' => t('Replacement patterns'),
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#description' => t('Prefer raw-text replacements for text to avoid problems with HTML entities!'),
+      'help' => array(
+        '#theme' => 'token_tree',
+        '#token_types' => array($instance['entity_type']),
+        '#global_types' => TRUE,
+        '#click_insert' => TRUE,
+      ),
+    ),
+
   );
 
   return $element;
@@ -103,6 +117,7 @@ function twitter_post_field_is_empty($item, $field) {
  * Adds a select field to choose a Twitter account.
  */
 function twitter_post_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  $langcode = empty($langcode) ? entity_language($entity_type, $entity) : $langcode;
   $options = array();
   module_load_include('inc', 'twitter');
   $twitter_accounts = twitter_load_authenticated_accounts();

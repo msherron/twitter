@@ -26,7 +26,8 @@ function twitter_post_permission() {
  */
 function twitter_post_entity_insert($entity, $type) {
   // First we find twitter_post fields.
-  $fields_info = field_info_instances($type, $entity->type);
+  list($id, $vid, $bundle) = entity_extract_ids($type, $entity);
+  $fields_info = field_info_instances($type, $bundle);
   foreach ($fields_info as $field_name => $value) {
     $field_info = field_info_field($field_name);
     if ($field_info['type'] == 'twitter_post') {
@@ -37,20 +38,7 @@ function twitter_post_entity_insert($entity, $type) {
       // Post to Twitter if the status checkbox is active.
       if ($status) {
         module_load_include('inc', 'twitter');
-        $replacements = array(
-          '!title' => $entity->title,
-          '!url' => url('node/' . $entity->nid, array('absolute' => TRUE, 'alias' => TRUE)),
-          '!url-alias' => url('node/' . $entity->nid, array('absolute' => TRUE)),
-          '!user' => $entity->name,
-        );
-
-        // Only generate the shortened URL if it's going to be used. No sense
-        // burning through TinyURLs without a good reason.
-        if (strstr($message, '!tinyurl') !== FALSE) {
-          $replacements['!tinyurl'] = twitter_shorten_url(url('node/' . $entity->nid, array('absolute' => TRUE)));
-        }
-
-        $message = strtr($message, $replacements);
+        $message = token_replace($message, array($type => $entity));
         $status = twitter_set_status($twitter_account, $message);
         if ($status) {
           drupal_set_message(t('Successfully posted to Twitter: <a href="@status" target="_blank">@status</a>', array(

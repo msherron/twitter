@@ -33,6 +33,13 @@ function twitter_post_field_schema($field) {
 function twitter_post_install() {}
 
 /**
+ * Implements hook_enable().
+ */
+function twitter_post_enable() {
+  drupal_set_message('Twitter Post field enabled. Edit any entity (such as Page, User or Comment) and add a Twitter field to it.');
+}
+
+/**
  * Implements hook_uninstall().
  */
 function twitter_post_uninstall() {

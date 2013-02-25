@@ -206,22 +206,24 @@ function twitter_cron() {
     ->propertyOrderBy('last_refresh')
     ->range(0, 20);
   $result = $query->execute();
-  $twitter_accounts = entity_load('twitter_account', array_keys($result['twitter_account']));
-
-  // Iterate over Twitter accounts and fetch tweets.
-  try {
-    foreach ($twitter_accounts as $twitter_account) {
-      // Fetch tweets and mentions.
-      twitter_fetch_user_timeline($twitter_account->twitter_uid);
-      if ($twitter_account->is_auth() && $twitter_account->mentions) {
-        twitter_fetch_mentions_timeline($twitter_account->id);
+  $ids = !empty($result['twitter_account']) ? array_keys($result['twitter_account']) : array();
+  if (count($ids)) {
+    $twitter_accounts = entity_load('twitter_account', $ids);
+    // Iterate over Twitter accounts and fetch tweets.
+    try {
+      foreach ($twitter_accounts as $twitter_account) {
+        // Fetch tweets and mentions.
+        twitter_fetch_user_timeline($twitter_account->twitter_uid);
+        if ($twitter_account->is_auth() && $twitter_account->mentions) {
+          twitter_fetch_mentions_timeline($twitter_account->id);
+        }
+        // Mark the time this account was updated.
+        $twitter_account->last_refresh = REQUEST_TIME;
+        entity_save('twitter_account', $twitter_account);
       }
-      // Mark the time this account was updated.
-      $twitter_account->last_refresh = REQUEST_TIME;
-      entity_save('twitter_account', $twitter_account);
+    } catch (TwitterException $e) {
+      // The exception has already been logged so we do not need to do anything here apart from catching it.
     }
-  } catch (TwitterException $e) {
-    // The exception has already been logged so we do not need to do anything here apart from catching it.
   }
 
   // Nuke old statuses.
