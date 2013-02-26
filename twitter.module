@@ -149,6 +149,7 @@ function twitter_theme() {
 function theme_twitter_user_accounts($variables) {
   $accounts = $variables['accounts'];
   $items = array();
+  module_load_include('inc', 'twitter');
   foreach ($accounts as $twitter_account) {
     $tweets = twitter_tweets($twitter_account->screen_name);
     // If we have tweets for this Twitter account, link to the View. If not, link to Twitter.

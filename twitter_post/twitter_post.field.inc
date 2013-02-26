@@ -127,7 +127,7 @@ function twitter_post_field_attach_form($entity_type, $entity, &$form, &$form_st
   $twitter_uid = key($options);
   $screen_name = current($options);
   foreach ($form_state['field'] as $field_name => $field) {
-    if ($field[$langcode]['field']['type'] == 'twitter_post') {
+    if (isset($field[$langcode]['field']['type']) && ($field[$langcode]['field']['type'] == 'twitter_post')) {
       $element = array();
       if (count($options) > 1) {
         $element['account'] = array(
