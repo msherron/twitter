@@ -31,19 +31,24 @@ function twitter_post_entity_insert($entity, $type) {
   foreach ($fields_info as $field_name => $value) {
     $field_info = field_info_field($field_name);
     if ($field_info['type'] == 'twitter_post') {
-      // Extract data out of each field.
-      $status = $entity->{$field_name}[$entity->language][0]['status'];
-      $message = $entity->{$field_name}[$entity->language][0]['message'];
-      $twitter_account = entity_load_single('twitter_account', $entity->{$field_name}[$entity->language][0]['account']);
-      // Post to Twitter if the status checkbox is active.
-      if ($status) {
-        module_load_include('inc', 'twitter');
-        $message = token_replace($message, array($type => $entity));
-        $status = twitter_set_status($twitter_account, $message);
-        if ($status) {
-          drupal_set_message(t('Successfully posted to Twitter: <a href="@status" target="_blank">@status</a>', array(
-            '@status' => _twitter_status_url($status),
-          )));
+      // Iterate field instances.
+      foreach ($entity->{$field_name}[$entity->language] as $delta => $field_instance) {
+        if (is_int($delta)) {
+          // Extract data out of each field.
+          $status = $field_instance['status'];
+          $message = $field_instance['message'];
+          $twitter_account = entity_load_single('twitter_account', $field_instance['account']);
+          // Post to Twitter if the status checkbox is active.
+          if ($status) {
+            module_load_include('inc', 'twitter');
+            $message = token_replace($message, array($type => $entity));
+            $status = twitter_set_status($twitter_account, $message);
+            if ($status) {
+              drupal_set_message(t('Successfully posted to Twitter: <a href="@status" target="_blank">@status</a>', array(
+                '@status' => _twitter_status_url($status),
+              )));
+            }
+          }
         }
       }
     }

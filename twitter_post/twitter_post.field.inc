@@ -39,7 +39,7 @@ function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance,
   }
 
   $status = isset($items[$delta]['status']) ? $items[$delta]['status'] : FALSE;
-  $message = isset($items[$delta]['message']) ? $items[$delta]['message'] : t('New post: !title !url-alias');
+  $message = isset($items[$delta]['message']) ? $items[$delta]['message'] : '';
   $element += array(
     '#type' => 'fieldset',
     '#group' => 'Social networks',
@@ -57,7 +57,7 @@ function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance,
       '#type' => 'textfield',
       '#title' => t('Twiter.com status'),
       '#default_value' => $message,
-      '#description' => t('The given text will be posted to twitter.com. You can use !url, !url-alias, !tinyurl, !title and !user as replacement text.'),
+      '#description' => t('The given text will be posted to Twitter.com. See Replacement Patterns below for a list of available tokens.'),
       '#maxlength' => 150,
       '#attached' => array(
         'js' => array(drupal_get_path('module', 'twitter_post') . '/twitter_post.js'),
@@ -148,7 +148,11 @@ function twitter_post_field_attach_form($entity_type, $entity, &$form, &$form_st
           '#markup' => _twitter_user_profile($screen_name),
         );
       }
-      $form[$field_name][$langcode][0] += $element;
+      foreach ($form[$field_name][$langcode] as $delta => $field_instance) {
+        if (is_int($delta)) {
+          $form[$field_name][$langcode][$delta] += $element;
+        }
+      }
     }
   }
 }
