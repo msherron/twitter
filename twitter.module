@@ -449,10 +449,11 @@ class TwitterStatus extends Entity {
    * Constructor for TwitterStatus
    */
   public function __construct($values = array()) {
-    parent::__construct($values, 'twitter_status');
     if (isset($values['user'])) {
       $this->user = new TwitterAccount($values['user']);
+      unset($values['user']);
     }
+    parent::__construct($values, 'twitter_status');
   }
 }
 

@@ -153,8 +153,7 @@ function twitter_fetch_user_timeline($id) {
   }
   // Update Twitter account data.
   if (count($statuses) > 0) {
-    $twitter_account = new TwitterAccount((array) $statuses[0]->user);
-    entity_save('twitter_account', $twitter_account);
+    entity_save('twitter_account', $statuses[0]->user);
   }
 }
 

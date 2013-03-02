@@ -153,7 +153,8 @@ class Twitter {
    *   stdClass response object.
    */
   protected function doRequest($url, $headers, $method, $data) {
-    return drupal_http_request($url, array('headers' => $headers, 'method' => $method, 'data' => $data));
+    $response = drupal_http_request($url, array('headers' => $headers, 'method' => $method, 'data' => $data));
+    return $response;
   }
 
   protected function parse_response($response) {

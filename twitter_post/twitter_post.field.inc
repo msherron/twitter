@@ -39,7 +39,8 @@ function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance,
   }
 
   $status = isset($items[$delta]['status']) ? $items[$delta]['status'] : FALSE;
-  $message = isset($items[$delta]['message']) ? $items[$delta]['message'] : '';
+  $default_message = _twitter_post_default_message($instance['entity_type']);
+  $message = isset($items[$delta]['message']) ? $items[$delta]['message'] : $default_message;
   $element += array(
     '#type' => 'fieldset',
     '#group' => 'Social networks',
@@ -81,6 +82,32 @@ function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance,
   );
 
   return $element;
+}
+
+/**
+ * Sets default messages for core entities.
+ *
+ * @param string $entity_type
+ *   The entity type name.
+ * @return
+ *   A string with a suggested default message for the tweet.
+ */
+function _twitter_post_default_message($entity_type) {
+  switch ($entity_type) {
+    case 'comment':
+      $message = 'New comment: [comment:url:absolute]';
+      break;
+    case 'node':
+      $message = 'New post: [node:title] [node:url:absolute]';
+      break;
+    case 'user':
+      $message = 'New user: [current-user:name]';
+      break;
+    default:
+      $message = 'Select replacement patterns below to build your tweet.';
+      break;
+  }
+  return $message;
 }
 
 /**
