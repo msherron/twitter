@@ -42,12 +42,6 @@ function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance,
   $default_message = _twitter_post_default_message($instance['entity_type']);
   $message = isset($items[$delta]['message']) ? $items[$delta]['message'] : $default_message;
   $element += array(
-    '#type' => 'fieldset',
-    '#group' => 'Social networks',
-    '#title' => t('Post to twitter.com'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-    '#tree' => TRUE,
     'status' => array(
       '#type' => 'checkbox',
       '#title' => t('Announce this post on Twitter'),
