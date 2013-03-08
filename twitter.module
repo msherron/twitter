@@ -341,8 +341,8 @@ function twitter_views_api() {
  * Implements hook_user_load().
  */
 function twitter_user_load($accounts) {
-  foreach ($accounts as $uid => $account) {
-    $accounts[$uid]->twitter_accounts = module_invoke_all('twitter_accounts', $account);
+  foreach ($accounts as $twitter_uid => $account) {
+    $accounts[$twitter_uid]->twitter_accounts = module_invoke_all('twitter_accounts', $account);
   }
 }
 
