@@ -232,7 +232,10 @@ function _twitter_signin_add_account($edit, $account) {
     }
     $twitter_account->set_auth($response);
     $twitter_account->uid = $account->uid;
-    twitter_account_save($twitter_account, TRUE);
+    if (!entity_load_single('twitter_account', $twitter_account->twitter_uid)) {
+      $twitter_account->is_new = TRUE;
+    }
+    entity_save('twitter_account', $twitter_account);
 
     unset($_SESSION['twitter']);
     drupal_set_message(t('You have related a Twitter account with your user. Next time you can sign in with Twitter.'));

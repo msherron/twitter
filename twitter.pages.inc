@@ -454,7 +454,9 @@ function twitter_oauth_callback_form_submit($form, &$form_state) {
   $twitter_account->set_auth($response);
   global $user;
   $twitter_account->uid = $user->uid;
-  $twitter_account->is_new = TRUE;
+  if (!entity_load_single('twitter_account', $twitter_account->twitter_uid)) {
+    $twitter_account->is_new = TRUE;
+  }
   entity_save('twitter_account', $twitter_account);
 
   $form_state['programmed'] = FALSE;

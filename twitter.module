@@ -369,7 +369,8 @@ function twitter_twitter_accounts($account) {
  * Removes user's Twitter accounts and tweets
  */
 function twitter_user_delete($account) {
-  entity_delete_multiple('twitter_account', array_keys($account->twitter_accounts));
+  $twitter_accounts = twitter_twitter_accounts($account);
+  entity_delete_multiple('twitter_account', array_keys($twitter_accounts));
 }
 
 /**

@@ -33,7 +33,7 @@ function twitter_post_entity_insert($entity, $type) {
     if ($field_info['type'] == 'twitter_post') {
       // Iterate field instances.
       foreach ($entity->{$field_name}[$entity->language] as $delta => $field_instance) {
-        if (is_int($delta)) {
+        if (is_int($delta) && !empty($field_instance['account'])) {
           // Extract data out of each field.
           $status = $field_instance['status'];
           $message = $field_instance['message'];
