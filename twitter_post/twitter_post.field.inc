@@ -34,10 +34,6 @@ function twitter_post_field_widget_info() {
  * Implement hook_field_widget().
  */
 function twitter_post_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta = 0, $element) {
-  if (!user_access('post to twitter')) {
-    return $element;
-  }
-
   $status = isset($items[$delta]['status']) ? $items[$delta]['status'] : FALSE;
   $default_message = _twitter_post_default_message($instance['entity_type']);
   $message = isset($items[$delta]['message']) ? $items[$delta]['message'] : $default_message;
@@ -175,5 +171,14 @@ function twitter_post_field_attach_form($entity_type, $entity, &$form, &$form_st
         }
       }
     }
+  }
+}
+
+/**
+ * Implements hook_field_access()
+ */
+function twitter_post_field_access($op, $field, $entity_type, $entity, $account) {
+  if ($field['type'] == 'twitter_post') {
+    return user_access('post to twitter', $account);
   }
 }
