@@ -289,7 +289,7 @@ function twitter_account_list_form_submit($form, &$form_state) {
     $twitter_account = entity_load_single('twitter_account', $account['twitter_uid']);
     if (empty($account['delete'])) {
       $twitter_account->import = $account['import'];
-      if (!isset($twitter_account->mentions)) {
+      if (isset($twitter_account->mentions)) {
         $twitter_account->mentions = $account['mentions'];
       }
       entity_save('twitter_account', $twitter_account);
