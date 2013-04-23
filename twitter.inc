@@ -204,9 +204,7 @@ function twitter_account_save($twitter_account) {
   // Check whether this account exists and load its defaults prior to save.
   $twitter_account->is_new = $twitter_account_db ? FALSE : TRUE;
   if ($twitter_account_db) {
-    dd('exists');
     $twitter_account = (object) array_merge((array) $twitter_account_db, (array) $twitter_account);
-    dd($twitter_account);
   }
   entity_save('twitter_account', $twitter_account);
 }
