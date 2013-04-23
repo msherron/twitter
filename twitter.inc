@@ -114,6 +114,7 @@ function twitter_status_save($status) {
   $twitter_status->in_reply_to_user_id = (int) $status->in_reply_to_user_id;
   $twitter_status->in_reply_to_screen_name = $status->in_reply_to_screen_name;
   $twitter_status->truncated = (int) $status->truncated;
+  $twitter_status->is_new = entity_load_single('twitter_status', $twitter_status->twitter_id) ? FALSE : TRUE;
   entity_save('twitter_status', $twitter_status);
 }
 
@@ -153,7 +154,7 @@ function twitter_fetch_user_timeline($id) {
   }
   // Update Twitter account data.
   if (count($statuses) > 0) {
-    entity_save('twitter_account', $statuses[0]->user);
+    twitter_account_save($statuses[0]->user);
   }
 }
 
@@ -167,13 +168,9 @@ function twitter_fetch_mentions_timeline($id) {
 
   $params = array();
   $statuses = $twitter->mentions_timeline($params);
-  foreach ($statuses as $status) {
-    if (!entity_load_single('twitter_account', $status->user->id)) {
-      // Save the twitter account who made the mention.
-      $twitter_account = new TwitterAccount((array) $status->user);
-      entity_save('twitter_account', $twitter_account);
-    }
-    twitter_status_save($status);
+  foreach ($statuses as $twitter_status) {
+    twitter_account_save($twitter_status->user);
+    twitter_status_save($twitter_status);
   }
 }
 
@@ -194,6 +191,24 @@ function twitter_tweets($screen_name = NULL) {
   $twitter_statuses = entity_load('twitter_status', $ids);
 
   return $twitter_statuses;
+}
+
+/**
+ * Saves a twitter account.
+ *
+ * @param object $twitter_account
+ *   A TwitterAccount instance.
+ */
+function twitter_account_save($twitter_account) {
+  $twitter_account_db = entity_load_single('twitter_account', $twitter_account->twitter_uid);
+  // Check whether this account exists and load its defaults prior to save.
+  $twitter_account->is_new = $twitter_account_db ? FALSE : TRUE;
+  if ($twitter_account_db) {
+    dd('exists');
+    $twitter_account = (object) array_merge((array) $twitter_account_db, (array) $twitter_account);
+    dd($twitter_account);
+  }
+  entity_save('twitter_account', $twitter_account);
 }
 
 /**

@@ -216,11 +216,11 @@ function twitter_cron() {
         // Fetch tweets and mentions.
         twitter_fetch_user_timeline($twitter_account->twitter_uid);
         if ($twitter_account->is_auth() && $twitter_account->mentions) {
-          twitter_fetch_mentions_timeline($twitter_account->id);
+          twitter_fetch_mentions_timeline($twitter_account->twitter_uid);
         }
         // Mark the time this account was updated.
         $twitter_account->last_refresh = REQUEST_TIME;
-        entity_save('twitter_account', $twitter_account);
+        twitter_account_save($twitter_account);
       }
     } catch (TwitterException $e) {
       // The exception has already been logged so we do not need to do anything here apart from catching it.
@@ -458,60 +458,10 @@ class TwitterStatus extends Entity {
   }
 }
 
+/**
+ * Class to define the structure of a Twitter account.
+ */
 class TwitterAccount extends Entity {
-
-  public $id;
-
-  public $screen_name;
-
-  public $name;
-
-  public $location;
-
-  public $description;
-
-  public $followers_count;
-
-  public $friends_count;
-
-  public $statuses_count;
-
-  public $favourites_count;
-
-  public $url;
-
-  public $protected;
-
-  public $profile_image_url;
-
-  public $profile_background_color;
-
-  public $profile_text_color;
-
-  public $profile_link_color;
-
-  public $profile_sidebar_fill_color;
-
-  public $profile_sidebar_border_color;
-
-  public $profile_background_image_url;
-
-  public $profile_background_tile;
-
-  public $verified;
-
-  public $created_at;
-
-  public $created_time;
-
-  public $utc_offset;
-
-  public $status;
-
-  public $oauth_token;
-
-  public $oauth_token_secret;
-
   /**
    * Constructor
    */
