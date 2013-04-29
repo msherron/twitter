@@ -219,6 +219,35 @@ class Twitter {
   }
 
   /**
+   * Get an array of TwitterStatus objects matching a specified query.
+   *
+   * @param array $params
+   *   parameters including the search query.
+   *
+   * @return array
+   *   An array of TwitterStatus objects.
+   *
+   * @see https://dev.twitter.com/docs/api/1.1/get/search/tweets
+   */
+  protected function get_search_results($params = array()) {
+    $values = $this->call('search/tweets', $params, 'GET');
+    // Check on successfull call
+    if (isset($values) && isset($values['statuses'])) {
+      $statuses = array();
+      foreach ($values['statuses'] as $status) {
+        $statuses[] = new TwitterStatus($status);
+      }
+      return $statuses;
+    }
+    // Call might return FALSE , e.g. on failed authentication
+    else {
+      // As call already throws an exception, we can return an empty array to
+      // break no code.
+      return array();
+    }
+  }
+
+  /**
    * Get an array of TwitterAccount objects from an API endpoint
    */
   protected function get_users($path, $params = array()) {
@@ -431,7 +460,7 @@ class Twitter {
    */
   public function search_tweets($query, $params = array()) {
     $params['q'] = $query;
-    return $this->get_statuses('statuses/oembed', $params);
+    return $this->get_search_results($params);
   }
 
   /********************************************//**
