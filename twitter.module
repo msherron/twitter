@@ -378,13 +378,12 @@ function twitter_user_delete($account) {
  *
  * Adds Twitter account information to the user profile.
  */
-function twitter_user_view_alter(&$build) {
-  $user = $build['#account'];
-  if (!empty($user->twitter_accounts)) {
+function twitter_user_view_alter(&$build, \Drupal\user\Plugin\Core\Entity\User $account, \Drupal\entity\Plugin\Core\Entity\EntityDisplay $display) {
+  if (!empty($account->twitter_accounts)) {
     $build['twitter'] = array(
       '#type' => 'user_profile_item',
       '#title' => t('Twitter accounts'),
-      '#markup' => theme('twitter_user_accounts', array('accounts' => $user->twitter_accounts)),
+      '#markup' => theme('twitter_user_accounts', array('accounts' => $account->twitter_accounts)),
       '#weight' => 10,
     );
   }
