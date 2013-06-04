@@ -1,0 +1,6 @@
+name: 'Twitter Signin'
+type: module
+description: 'Adds support for "Sign in with Twitter".'
+core: 8.x
+dependencies:
+  - twitter
