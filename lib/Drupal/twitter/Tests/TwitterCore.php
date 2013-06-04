@@ -2,28 +2,33 @@
 
 /**
  * @file
- * Functional tests for the twitter Module.
+ * Definition of Drupal\twitter\Tests\TwitterCore.
  */
 
-class TwitterTest extends DrupalWebTestCase {
-  /*'
-   * The getInfo() method provides information about the test.
-   * In order for the test to be run, the getInfo() method needs
-   * to be implemented.
-   */
-  public static function getInfo() {
-    return array(
-      'name' => t('Main'),
-      'description' => t('Tests main module features such as adding accounts or loading tweets.'),
-      'group' => t('Twitter'),
-    );
-  }
+namespace Drupal\twitter\Tests;
+
+use Drupal\simpletest\WebTestBase;
+
+/**
+ * Tests the Twitter module functionality.
+ */
+class TwitterCore extends WebTestBase {
 
   /**
-   * Prepares the testing environment
+   * Modules to enable.
+   *
+   * @var array
    */
-  function setUp() {
-    parent::setUp('twitter', 'views', 'twitter_mock');
+  public static $modules = array('twitter', 'views', 'twitter_mock');
+
+  protected $user;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Main tests',
+      'description' => 'Tests main module features such as adding accounts or loading tweets.',
+      'group' => 'Twitter',
+    );
   }
 
   /**

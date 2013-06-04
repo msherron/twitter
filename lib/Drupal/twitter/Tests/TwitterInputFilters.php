@@ -2,28 +2,30 @@
 
 /**
  * @file
- * Functional tests for the input filters of the twitter module.
+ * Definition of Drupal\twitter\Tests\TwitterInputFilters.
  */
 
-class TwitterInputFilterTest extends DrupalWebTestCase {
-  /*'
-   * The getInfo() method provides information about the test.
-   * In order for the test to be run, the getInfo() method needs
-   * to be implemented.
-   */
-  public static function getInfo() {
-    return array(
-      'name' => t('Input filters'),
-      'description' => t('Tests input filters provided by the Twitter module.'),
-      'group' => t('Twitter'),
-    );
-  }
+namespace Drupal\twitter\Tests;
+
+use Drupal\simpletest\WebTestBase;
+
+class TwitterInputFilters extends WebTestBase {
 
   /**
-   * Prepares the testing environment
+   * Modules to enable.
+   *
+   * @var array
    */
-  function setUp() {
-    parent::setUp('twitter');
+  public static $modules = array('twitter');
+
+  protected $privileged_user;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Input filters',
+      'description' => 'Tests input filters provided by the Twitter module.',
+      'group' => 'Twitter',
+    );
   }
 
   /**
@@ -52,20 +54,20 @@ class TwitterInputFilterTest extends DrupalWebTestCase {
     $this->assertText(t('The text format Filtered HTML has been updated.'));
     $this->drupalGet('admin/config/content/formats/filtered_html');
     $this->assertFieldChecked('edit-filters-twitter-username-status',
-                              t('Twitter username input filter has been activated'));
+                              'Twitter username input filter has been activated');
     $this->assertFieldChecked('edit-filters-twitter-hashtag-status',
-                              t('Twitter hashtag input filter has been activated'));
+                              'Twitter hashtag input filter has been activated');
 
     // Create a page so we can evaluate the filters
     $search = '#drupal';
     $username = '@drupal';
     $edit = array();
-    $edit['title'] = t('Test page');
-    $edit['body[und][0][value]'] = t('This is a search over #drupal tag. There is also a link ' .
-      ' to a Twitter account here: @drupal.');
+    $edit['title'] = 'Test page';
+    $edit['body[und][0][value]'] = 'This is a search over #drupal tag. There is also a link ' .
+      ' to a Twitter account here: @drupal.';
     $this->drupalPost('node/add/page', $edit, t('Save'));
     $this->assertText(t('Basic page @title has been created.', array('@title' => $edit['title'])));
-    $this->assertLink($search, 0, t('Twitter search input filter was created successfully.'));
-    $this->assertLink($username, 0, t('Twitter username input filter was created successfully.'));
+    $this->assertLink($search, 0, 'Twitter search input filter was created successfully.');
+    $this->assertLink($username, 0, 'Twitter username input filter was created successfully.');
   }
 }
