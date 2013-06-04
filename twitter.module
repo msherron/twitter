@@ -70,10 +70,7 @@ function twitter_menu() {
   $items['admin/config/services/twitter/settings'] = array(
     'title' => 'Settings',
     'description' => 'Twitter settings.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('twitter_admin_form'),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'twitter.pages.inc',
+    'route_name' => 'twitter_settings_form',
     'type' => MENU_LOCAL_TASK,
   );
 
