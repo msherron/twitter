@@ -243,12 +243,14 @@ function twitter_filter_info() {
   $filters['twitter_username'] = array(
     'title' => t('Twitter @username converter'),
     'description' => t('Converts Twitter-style @usernames into links to Twitter account pages.'),
+    'type' => FILTER_TYPE_TRANSFORM_IRREVERSIBLE,
     'process callback' => '_twitter_filter_username',
     'tips callback' => '_twitter_filter_tip_username',
   );
   $filters['twitter_hashtag'] = array(
     'title' => t('Twitter #hashtag converter'),
     'description' => t('Converts Twitter-style #hashtags into links to hashtags.org.'),
+    'type' => FILTER_TYPE_TRANSFORM_IRREVERSIBLE,
     'process callback' => '_twitter_filter_hashtag',
     'tips callback' => '_twitter_filter_tip_hashtag',
   );
@@ -256,6 +258,7 @@ function twitter_filter_info() {
     'title' => t('Twitter link converter'),
     'description' => t('Makes links in Twitter messages to be opened in new windows and adds ' .
                        'rel="nofollow" so these links do not penalize SEO.'),
+    'type' => FILTER_TYPE_TRANSFORM_IRREVERSIBLE,
     'process callback' => '_twitter_filter_link',
     'tips callback' => '_twitter_filter_tip_link',
   );
