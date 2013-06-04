@@ -322,13 +322,7 @@ function twitter_schema() {
  */
 function twitter_install() {
   // Set the weight to 3, making it heavier than Pathauto.
-  db_update('system')
-    ->fields(array(
-        'weight' => 3,
-      ))
-    ->condition('type', 'module')
-    ->condition('name', 'twitter')
-    ->execute();
+  module_set_weight('twitter', 3);
 }
 
 /**
