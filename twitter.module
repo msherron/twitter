@@ -4,6 +4,8 @@
  * Provides API integration with the Twitter microblogging service.
  */
 
+use Drupal\Core\Entity\Entity;
+
 define ('TWITTER_HOST',         'http://twitter.com');
 define ('TWITTER_API',          'https://api.twitter.com');
 define ('TWITTER_SEARCH',       'http://search.twitter.com');
@@ -197,7 +199,7 @@ function twitter_cron() {
   // Pull up a list of Twitter accounts that are flagged for updating,
   // sorted by how long it's been since we last updated them. This ensures
   // that the most out-of-date accounts get updated first.
-  $query = new EntityFieldQuery();
+  $query = Drupal::EntityQuery('twitter_account');
   $query->entityCondition('entity_type', 'twitter_account')
     ->propertyCondition('uid', 0, '<>')
     ->propertyCondition('import', 1)
@@ -350,7 +352,7 @@ function twitter_user_load($accounts) {
  *   array with Twitter accounts
  */
 function twitter_twitter_accounts($account) {
-  $query = new EntityFieldQuery();
+  $query = Drupal::EntityQuery('twitter_account');
   $query->entityCondition('entity_type', 'twitter_account')
     ->propertyCondition('uid', $account->uid);
   $result = $query->execute();
