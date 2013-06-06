@@ -45,7 +45,7 @@ class Twitter {
   }
 
   public function get_request_token() {
-    $url = variable_get('twitter_api', TWITTER_API) . '/oauth/request_token';
+    $url = config('twitter.settings')->get('api') . '/oauth/request_token';
     try {
       $params = array('oauth_callback' => url('twitter/oauth', array('absolute' => TRUE)));
       $response = $this->auth_request($url, $params);
@@ -60,14 +60,14 @@ class Twitter {
   }
 
   public function get_authorize_url($token) {
-    $url = variable_get('twitter_api', TWITTER_API) . '/oauth/authorize';
+    $url = config('twitter.settings')->get('api') . '/oauth/authorize';
     $url.= '?oauth_token=' . $token['oauth_token'];
 
     return $url;
   }
 
   public function get_authenticate_url($token) {
-    $url = variable_get('twitter_api', TWITTER_API) . '/oauth/authenticate';
+    $url = config('twitter.settings')->get('api') . '/oauth/authenticate';
     $url.= '?oauth_token=' . $token['oauth_token'];
 
     return $url;
@@ -83,7 +83,7 @@ class Twitter {
    *   String the access token or FALSE when there was an error.
    */
   public function get_access_token($oauth_verifier = NULL) {
-    $url = variable_get('twitter_api', TWITTER_API) . '/oauth/access_token';
+    $url = config('twitter.settings')->get('api') . '/oauth/access_token';
 
     // Adding parameter oauth_verifier to auth_request
     $parameters = array();
@@ -190,7 +190,7 @@ class Twitter {
    *   The complete path to the endpoint.
    */
   protected function create_url($path, $format = '.json') {
-    $url =  variable_get('twitter_api', TWITTER_API) .'/1.1/'. $path . $format;
+    $url =  config('twitter.settings')->get('api') .'/1.1/'. $path . $format;
     return $url;
   }
 

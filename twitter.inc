@@ -28,7 +28,8 @@ function twitter_connect($account = NULL) {
   if ($account) {
     $auth = $account->get_auth();
     if (isset($auth['oauth_token']) && isset($auth['oauth_token_secret'])) {
-      return new Twitter(variable_get('twitter_consumer_key', ''), variable_get('twitter_consumer_secret', ''),
+      $twitter_settings = config('twitter.settings');
+      return new Twitter($twitter_settings->('consumer_key'), $twitter_settings->get('consumer_secret'),
                               $auth['oauth_token'], $auth['oauth_token_secret']);
     }
   }

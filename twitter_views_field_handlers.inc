@@ -13,7 +13,7 @@ class twitter_views_handler_field_xss extends views_handler_field {
     $options['link_urls'] = array('default' => TRUE);
     $options['link_usernames'] = array('default' => TRUE);
     $options['link_hashtags'] = array('default' => FALSE);
-    $options['hashtags_url'] = array('default' => variable_get('twitter_search', TWITTER_SEARCH) . '/search?q=%23');
+    $options['hashtags_url'] = array('default' => config('twitter.settings')->get('search') . '/search?q=%23');
     $options['link_attributes'] = array('default' => TRUE);
     return $options;
   }
@@ -62,7 +62,7 @@ class twitter_views_handler_field_xss extends views_handler_field {
     }
     // Link usernames with their profiles.
     if (!empty($this->options['link_usernames'])) {
-      $value = _twitter_filter_text($value, '@', variable_get('twitter_host', TWITTER_HOST) . '/');
+      $value = _twitter_filter_text($value, '@', config('twitter.settings')->get('host') . '/');
     }
     // Link hashtags.
     if (!empty($this->options['link_hashtags']) && valid_url($this->options['hashtags_url'])) {

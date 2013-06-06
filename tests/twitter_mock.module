@@ -14,16 +14,7 @@
  */
 function twitter_mock_enable() {
   global $base_root;
-  variable_set('twitter_api', $base_root);
-}
-
-/**
- * Implements hook_disable().
- *
- * Sets the Twitter API host back to its default value
- */
-function twitter_mock_disable() {
-  variable_del('twitter_api');
+  config('twitter.settings')->set('api', $base_root)->save();
 }
 
 /**

@@ -6,11 +6,6 @@
 
 use Drupal\Core\Entity\Entity;
 
-define ('TWITTER_HOST',         'http://twitter.com');
-define ('TWITTER_API',          'https://api.twitter.com');
-define ('TWITTER_SEARCH',       'http://search.twitter.com');
-define ('TWITTER_TINYURL',      'http://tinyurl.com');
-
 /**
  * Implements hook_entity_info().
  */
@@ -170,7 +165,8 @@ function twitter_shorten_url($url) {
     return shorten_url($url);
   }
   else {
-    $response = drupal_http_request(variable_get('twitter_tinyurl', TWITTER_TINYURL) . "/api-create.php?url=" . $url);
+
+    $response = drupal_http_request(config('twitter.settings')->get('tinyurl') . "/api-create.php?url=" . $url);
     if ($response->code == 200) {
       return $response->data;
     }
@@ -186,7 +182,7 @@ function twitter_shorten_url($url) {
  * Imports new Twitter statuses for site users, and deletes expired tweets.
  */
 function twitter_cron() {
-  if (!variable_get('twitter_import', TRUE)) {
+  if (!config('twitter_settings')->get('import')) {
     return;
   }
   // Check if we can connect to Twitter before proceeding.
@@ -227,7 +223,7 @@ function twitter_cron() {
   }
 
   // Nuke old statuses.
-  if ($age = variable_get('twitter_expire', 0)) {
+  if ($age = config('twitter.settings')->get('expire')) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'twitter_account')
       ->propertyCondition('created_time', REQUEST_TIME - $age, '<');
@@ -294,7 +290,7 @@ function _twitter_filter_tip_link($filter, $format, $long = FALSE) {
  */
 function _twitter_filter_username($text, $filter) {
   $prefix = '@';
-  $destination = variable_get('twitter_host', TWITTER_HOST) . '/';
+  $destination = config('twitter.settings')->get('host') . '/';
   return _twitter_filter_text($text, $prefix, $destination);
 }
 
@@ -303,7 +299,7 @@ function _twitter_filter_username($text, $filter) {
  */
 function _twitter_filter_hashtag($text, $filter) {
   $prefix = '#';
-  $destination = variable_get('twitter_search', TWITTER_SEARCH) . '/search?q=%23';
+  $destination = config('twitter.settings')->get('search') . '/search?q=%23';
   return _twitter_filter_text($text, $prefix, $destination);
 }
 
@@ -398,8 +394,9 @@ function twitter_user_view_alter(&$build, \Drupal\user\Plugin\Core\Entity\User $
  *   boolean TRUE if both the Twitter Application key and secret are set.
  */
 function twitter_api_keys() {
-  $key = variable_get('twitter_consumer_key');
-  $secret = variable_get('twitter_consumer_secret');
+  $twitter_settings = config('twitter.settings');
+  $key = $twitter_settings->get('consumer_key');
+  $secret = $twitter_settings->get('consumer_secret');
   return !(empty($key) && empty($secret));
 }
 
@@ -407,7 +404,7 @@ function twitter_api_keys() {
  * Helper to build a Twitter profile URL
  */
 function _twitter_user_profile($screen_name) {
-  return l('@' . $screen_name, TWITTER_HOST . '/' . $screen_name);
+  return l('@' . $screen_name, config('twitter.settings')->get('host') . '/' . $screen_name);
 }
 
 /**
@@ -417,7 +414,7 @@ function _twitter_user_profile($screen_name) {
  *   A TwitterStatus object.
  */
 function _twitter_status_url($status) {
-  return TWITTER_HOST . '/' . $status->user->screen_name . '/status/' . $status->id;
+  return config('twitter.settings')->get('host') . '/' . $status->user->screen_name . '/status/' . $status->id;
 }
 
 /**
