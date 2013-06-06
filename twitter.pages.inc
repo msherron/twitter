@@ -385,7 +385,7 @@ function twitter_oauth_callback_form_submit($form, &$form_state) {
     return;
   }
   // Save the new Twitter account and set the user's uid who added it.
-  $twitter_account->set_auth($response);
+  $twitter_account->setAuth($response);
   global $user;
   $twitter_account->uid = $user->uid;
   twitter_account_save($twitter_account);

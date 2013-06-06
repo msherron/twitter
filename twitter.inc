@@ -26,7 +26,7 @@ function twitter_connect($account = NULL) {
   }
 
   if ($account) {
-    $auth = $account->get_auth();
+    $auth = $account->getAuth();
     if (isset($auth['oauth_token']) && isset($auth['oauth_token_secret'])) {
       $twitter_settings = config('twitter.settings');
       return new Twitter($twitter_settings->('consumer_key'), $twitter_settings->get('consumer_secret'),
@@ -94,7 +94,7 @@ function twitter_load_authenticated_accounts() {
   $accounts = twitter_load_accounts();
   $auth_accounts = array();
   foreach ($accounts as $index => $account) {
-    if ($account->is_auth()) {
+    if ($account->isAuth()) {
       $auth_accounts[] = $account;
     }
   }
@@ -108,12 +108,12 @@ function twitter_status_save($status) {
   $twitter_status = new TwitterStatus();
   $twitter_status->twitter_id = $status->id;
   $twitter_status->screen_name = $status->user->screen_name;
-  $twitter_status->created_time = strtotime($status->created_at);
+  $twitter_status->created_time = strtotime($status->createdAt);
   $twitter_status->text = $status->text;
   $twitter_status->source = $status->source;
-  $twitter_status->in_reply_to_status_id = ($status->in_reply_to_status_id > 0) ? (string) $status->in_reply_to_status_id : NULL;
-  $twitter_status->in_reply_to_user_id = (int) $status->in_reply_to_user_id;
-  $twitter_status->in_reply_to_screen_name = $status->in_reply_to_screen_name;
+  $twitter_status->inReplyToStatusId = ($status->inReplyToStatusId > 0) ? (string) $status->inReplyToStatusId : NULL;
+  $twitter_status->inReplyToUserId = (int) $status->inReplyToUserId;
+  $twitter_status->inReplyToScreenName = $status->inReplyToScreenName;
   $twitter_status->truncated = (int) $status->truncated;
   $twitter_status->is_new = entity_load_single('twitter_status', $twitter_status->twitter_id) ? FALSE : TRUE;
   entity_save('twitter_status', $twitter_status);
