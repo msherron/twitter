@@ -1,9 +1,0 @@
-name: 'Twitter Mock'
-type: module
-description: 'Sets up a mock web server to simulate API calls on tests'
-package: Testing
-version: VERSION
-core: 8.x
-hidden: true
-dependencies:
-  - twitter

@@ -1,6 +1,0 @@
-twitter_settings_form:
-  pattern: '/admin/config/services/twitter/settings'
-  defaults:
-    _form: '\Drupal\twitter\Form\TwitterSettingsForm'
-  requirements:
-    _permission: 'administer site configuration'
