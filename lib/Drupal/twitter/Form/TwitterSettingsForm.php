@@ -99,7 +99,8 @@ class TwitterSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, array &$form_state) {
-    config('twitter.settings')
+    $twitter_config = $this->configFactory->get('twitter.settings');
+    $twitter_config
       ->set('import', $form_state['values']['import'])
       ->set('expire', $form_state['values']['expire'])
       ->set('consumer_key', $form_state['values']['consumer_key'])
