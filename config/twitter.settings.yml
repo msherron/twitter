@@ -1,8 +1,8 @@
 consumer_key: NULL
 consumer_secret: NULL
 api: 'https://api.twitter.com'
-host: 'http://twitter.com'
+host: 'https://twitter.com'
 tinyurl: 'http://tinyurl.com'
 import: TRUE
 expire: 0
-search: 'http://twitter.com/search'
+search: 'https://twitter.com/search'
