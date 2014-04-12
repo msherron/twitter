@@ -6,12 +6,13 @@
 
 namespace Drupal\twitter\Form;
 
-use Drupal\system\SystemConfigFormBase;
+use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Component\Utility\MapArray;
 
 /**
  * Configure twitter settings for this site.
  */
-class TwitterSettingsForm extends SystemConfigFormBase {
+class TwitterSettingsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
@@ -24,17 +25,18 @@ class TwitterSettingsForm extends SystemConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, array &$form_state) {
-    $twitter_settings = config('twitter.settings');
+    $twitter_config = $this->configFactory->get('twitter.settings');
     $form['import'] = array(
       '#type' => 'checkbox',
       '#title' => t('Import and display the Twitter statuses of site users who have entered their Twitter account information.'),
-      '#default_value' => $twitter_settings->get('import'),
+      '#default_value' => $twitter_config->get('import'),
     );
+    $intervals = array(604800, 2592000, 7776000, 31536000);
     $form['expire'] = array(
       '#type' => 'select',
       '#title' => t('Delete old statuses'),
-      '#default_value' => $twitter_settings->get('expire'),
-      '#options' => array(0 => t('Never')) + drupal_map_assoc(array(604800, 2592000, 7776000, 31536000), 'format_interval'),
+      '#default_value' => $twitter_config->get('expire'),
+      '#options' => array(0 => t('Never')) + array_map('format_interval', array_combine($intervals, $intervals)),
       '#states' => array(
          'visible' => array(
            ':input[name=twitter_import]' => array('checked' => TRUE),
@@ -55,12 +57,12 @@ class TwitterSettingsForm extends SystemConfigFormBase {
     $form['oauth']['consumer_key'] = array(
       '#type' => 'textfield',
       '#title' => t('OAuth Consumer key'),
-      '#default_value' => $twitter_settings->get('consumer_key'),
+      '#default_value' => $twitter_config->get('consumer_key'),
     );
     $form['oauth']['consumer_secret'] = array(
       '#type' => 'textfield',
       '#title' => t('OAuth Consumer secret'),
-      '#default_value' => $twitter_settings->get('consumer_secret'),
+      '#default_value' => $twitter_config->get('consumer_secret'),
     );
     // Twitter external APIs settings.
     $form['twitter'] = array(
@@ -72,22 +74,22 @@ class TwitterSettingsForm extends SystemConfigFormBase {
     $form['twitter']['host'] = array(
       '#type' => 'textfield',
       '#title' => t('Twitter host'),
-      '#default_value' => $twitter_settings->get('host'),
+      '#default_value' => $twitter_config->get('host'),
     );
     $form['twitter']['api'] = array(
       '#type' => 'textfield',
       '#title' => t('Twitter API'),
-      '#default_value' => $twitter_settings->get('api'),
+      '#default_value' => $twitter_config->get('api'),
     );
     $form['twitter']['search'] = array(
       '#type' => 'textfield',
       '#title' => t('Twitter search'),
-      '#default_value' => $twitter_settings->get('search'),
+      '#default_value' => $twitter_config->get('search'),
     );
     $form['twitter']['tinyurl'] = array(
       '#type' => 'textfield',
       '#title' => t('TinyURL'),
-      '#default_value' => $twitter_settings->get('tinyurl'),
+      '#default_value' => $twitter_config->get('tinyurl'),
     );
 
     return parent::buildForm($form, $form_state);
