@@ -7,4 +7,5 @@ dependencies:
   - views
   - entity
   - libraries
+  - oauth
 configure: admin/config/services/twitter
