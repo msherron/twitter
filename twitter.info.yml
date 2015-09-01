@@ -5,7 +5,6 @@ package: Twitter
 core: 8.x
 dependencies:
   - views
-  - entity
   - libraries
   - oauth
 configure: admin/config/services/twitter

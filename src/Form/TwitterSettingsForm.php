@@ -6,7 +6,9 @@
 
 namespace Drupal\twitter\Form;
 
+use Drupal\Core\Url;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\MapArray;
 
 /**
@@ -14,17 +16,27 @@ use Drupal\Component\Utility\MapArray;
  */
 class TwitterSettingsForm extends ConfigFormBase {
 
+
   /**
    * {@inheritdoc}
    */
-  public function getFormID() {
+  protected function getEditableConfigNames() {
+    return [
+      'twitter.settings'
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormId() {
     return 'twitter_settings_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $twitter_config = $this->configFactory->get('twitter.settings');
     $form['import'] = array(
       '#type' => 'checkbox',
@@ -32,11 +44,12 @@ class TwitterSettingsForm extends ConfigFormBase {
       '#default_value' => $twitter_config->get('import'),
     );
     $intervals = array(604800, 2592000, 7776000, 31536000);
+    $options = array_merge(array(0 => t('Never')), array_map('format_interval', array_combine($intervals, $intervals)));
     $form['expire'] = array(
       '#type' => 'select',
       '#title' => t('Delete old statuses'),
       '#default_value' => $twitter_config->get('expire'),
-      '#options' => array(0 => t('Never')) + array_map('format_interval', array_combine($intervals, $intervals)),
+      '#options' => $options,
       '#states' => array(
          'visible' => array(
            ':input[name=twitter_import]' => array('checked' => TRUE),
@@ -51,7 +64,7 @@ class TwitterSettingsForm extends ConfigFormBase {
     $form['oauth']['callback_url'] = array(
       '#type' => 'item',
       '#title' => t('Callback URL'),
-      '#markup' => url('twitter/oauth', array('absolute' => TRUE)),
+      '#markup' => new Url('twitter/oauth', array('absolute' => TRUE)),
     );
     $form['oauth']['consumer_key'] = array(
       '#type' => 'textfield',
@@ -97,7 +110,7 @@ class TwitterSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $twitter_config = $this->configFactory->get('twitter.settings');
     $twitter_config
       ->set('import', $form_state['values']['import'])

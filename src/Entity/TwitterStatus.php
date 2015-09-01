@@ -5,7 +5,7 @@
  * Definition of Drupal\twitter\Plugin\Core\Entity\TwitterStatus.
  */
 
-namespace Drupal\twitter\Plugin\Core\Entity;
+namespace Drupal\twitter\Entity;
 
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\Annotation\EntityType;
@@ -40,7 +40,7 @@ use Drupal\user\UserInterface;
  *   }
  * )
  */
-class TwitterStatus extends EntityNG {
+class TwitterStatus extends Entity {
   /**
    * @var created_at
    */

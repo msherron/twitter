@@ -11,6 +11,8 @@ use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests the Twitter module functionality.
+ *
+ * @group Twitter
  */
 class TwitterCore extends WebTestBase {
 
@@ -19,28 +21,18 @@ class TwitterCore extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('twitter', 'views', 'twitter_mock');
-
-  protected $user;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Main tests',
-      'description' => 'Tests main module features such as adding accounts or loading tweets.',
-      'group' => 'Twitter',
-    );
-  }
+  public static $modules = array('twitter', 'views');
 
   /**
    * Tests account addition without Oauth module activated
    */
   public function testAccountAdditionNoOauth() {
     // Create user
-    $this->user = $this->drupalCreateUser(array(
+    $twitter_user = $this->drupalCreateUser(array(
       'add twitter accounts',
       'import own tweets',
     ));
-    $this->drupalLogin($this->user);
+    $this->drupalLogin($twitter_user);
 
     // Add a Twitter account
     $edit = array(

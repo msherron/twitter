@@ -16,28 +16,18 @@ class TwitterInputFilters extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('twitter');
-
-  protected $privileged_user;
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Input filters',
-      'description' => 'Tests input filters provided by the Twitter module.',
-      'group' => 'Twitter',
-    );
-  }
+  public static $modules = array('filter', 'node', 'twitter');
 
   /**
    * Tests input filters
    */
   public function testInputFilters() {
     // Create user
-    $this->privileged_user = $this->drupalCreateUser(array(
+    $privileged_user = $this->drupalCreateUser(array(
       'bypass node access',
       'administer filters',
     ));
-    $this->drupalLogin($this->privileged_user);
+    $this->drupalLogin($privileged_user);
 
     // Activate twitter input filters
     $edit = array(
